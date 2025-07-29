@@ -16,18 +16,18 @@ const { title, description = "Cooking meals inspired by iconic historical figure
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title} | Kaz Mielony</title>
   </head>
-  <body class="bg-gray-50">
-    <header class="bg-white shadow-sm">
+  <body class="bg-background text-text-light">
+    <header class="bg-dark border-b border-primary/20">
       <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <a href="/" class="text-2xl font-bold text-amber-600">Kaz Mielony</a>
+            <a href="/" class="text-xl sm:text-2xl font-bold text-primary">Kaz Mielony</a>
           </div>
-          <div class="flex items-center space-x-8">
-            <a href="/" class="text-gray-700 hover:text-amber-600 transition-colors">Home</a>
-            <a href="/recipes" class="text-gray-700 hover:text-amber-600 transition-colors">Recipes</a>
-            <a href="/episodes" class="text-gray-700 hover:text-amber-600 transition-colors">Episodes</a>
-            <a href="/about" class="text-gray-700 hover:text-amber-600 transition-colors">About</a>
+          <div class="flex items-center space-x-3 sm:space-x-6 lg:space-x-8">
+            <a href="/" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors">Home</a>
+            <a href="/recipes" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors">Recipes</a>
+            <a href="/episodes" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors">Episodes</a>
+            <a href="/about" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors">About</a>
           </div>
         </div>
       </nav>
@@ -37,31 +37,31 @@ const { title, description = "Cooking meals inspired by iconic historical figure
       <slot />
     </main>
 
-    <footer class="bg-gray-800 text-white mt-16">
+    <footer class="bg-dark border-t border-primary/20 text-text-light mt-16">
       <div class="max-w-7xl mx-auto px-4 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 class="text-lg font-bold mb-4">Kaz Mielony</h3>
-            <p class="text-gray-300">Exploring history through the meals of iconic figures.</p>
+            <h3 class="text-lg font-bold mb-4 text-primary">Kaz Mielony</h3>
+            <p class="text-text-light/70">Exploring history through the meals of iconic figures.</p>
           </div>
           <div>
-            <h3 class="text-lg font-bold mb-4">Quick Links</h3>
-            <ul class="space-y-2 text-gray-300">
-              <li><a href="/recipes" class="hover:text-white">All Recipes</a></li>
-              <li><a href="/episodes" class="hover:text-white">Episodes</a></li>
-              <li><a href="/about" class="hover:text-white">About</a></li>
+            <h3 class="text-lg font-bold mb-4 text-primary">Quick Links</h3>
+            <ul class="space-y-2 text-text-light/70">
+              <li><a href="/recipes" class="hover:text-primary transition-colors">All Recipes</a></li>
+              <li><a href="/episodes" class="hover:text-primary transition-colors">Episodes</a></li>
+              <li><a href="/about" class="hover:text-primary transition-colors">About</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-bold mb-4">Follow</h3>
-            <ul class="space-y-2 text-gray-300">
-              <li><a href="https://youtube.com/@kazmielony" class="hover:text-white">YouTube</a></li>
-              <li><a href="https://instagram.com/kazmielony" class="hover:text-white">Instagram</a></li>
-              <li><a href="https://twitter.com/kazmielony" class="hover:text-white">Twitter</a></li>
+            <h3 class="text-lg font-bold mb-4 text-primary">Follow</h3>
+            <ul class="space-y-2 text-text-light/70">
+              <li><a href="https://youtube.com/@kazmielony" class="hover:text-primary transition-colors">YouTube</a></li>
+              <li><a href="https://instagram.com/kazmielony" class="hover:text-primary transition-colors">Instagram</a></li>
+              <li><a href="https://twitter.com/kazmielony" class="hover:text-primary transition-colors">Twitter</a></li>
             </ul>
           </div>
         </div>
-        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+        <div class="border-t border-primary/20 mt-8 pt-8 text-center text-muted">
           <p>&copy; 2024 Kaz Mielony. All rights reserved.</p>
         </div>
       </div>

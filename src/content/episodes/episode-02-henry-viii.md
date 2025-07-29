@@ -1,29 +1,29 @@
 ---
-title: "Episode 2: Henry VIII's Royal Feast"
+title: "Episode 2: Einstein's Comfort Food"
 episodeNumber: 2
-historicalFigure: "Henry VIII"
-publishDate: 2024-01-20
+historicalFigure: "Albert Einstein"
+publishDate: 2024-07-29
 youtubeId: "dQw4w9WgXcQ"
-description: "Recreating the kind of massive roast that satisfied the Tudor king's legendary appetite"
-relatedRecipes: ["henry-viii-roast-beef"]
+description: "Recreating the creamy mushroom pasta that provided Einstein with comfort and sustenance during his Princeton years"
+relatedRecipes: ["einstein-creamy-mushroom-pasta"]
 ---
 
-## A King-Sized Appetite
+## A Physicist's Evening Meal
 
-Henry VIII was legendary for many things—his six wives, breaking from Rome, and his absolutely massive appetite. Historical records show he consumed between 4,000-5,000 calories per day, and beef was his absolute favorite.
+Einstein understood that great discoveries required not just brilliant thinking, but proper nourishment. This creamy mushroom pasta represents the kind of satisfying, substantial dinner that could fuel hours of scientific contemplation at Princeton.
 
-## The Tudor Table
+## The Science of Comfort Food
 
-Tudor banquets were theatrical events. This roast beef would have been just one of dozens of dishes served simultaneously, creating a display of wealth and power that reinforced Henry's authority.
+There's something almost scientific about Einstein's approach to this pasta—the careful balance of flavors, the precise timing, the way simple ingredients transform into something greater. It's molecular gastronomy before the term existed.
 
 ## Cooking Challenges
 
-The biggest challenge was scaling down recipes designed to feed a royal court. Original Tudor recipes called for entire sides of beef—we had to work backwards from serving sizes that could feed modern families while maintaining authentic flavors.
+The biggest challenge was achieving that perfect sauce consistency—creamy but not heavy, rich but not overwhelming. Just like Einstein's theories, it required patience and precision to get the balance exactly right.
 
-## Historical Accuracy vs. Modern Safety
+## Historical Accuracy vs. Modern Ingredients
 
-We made some concessions to modern food safety while preserving the essence of Tudor cooking. The original cooking methods and times have been adjusted for today's ovens and meat standards.
+We made some adaptations for modern kitchens while preserving the essence of Einstein's preferred flavors. The combination of Gruyère influences from his Swiss heritage with American ingredients reflects his later life in Princeton.
 
-## The Yorkshire Pudding Question
+## The Philosophy of Simple Complexity
 
-While Yorkshire pudding as we know it wasn't invented until after Henry's time, the concept of using drippings for bread-like accompaniments was well established in Tudor kitchens. Our version bridges historical accuracy with familiar flavors.
+While this pasta appears simple, there are layers of technique involved—much like Einstein's theories that appear elegant on the surface but reveal profound complexity underneath. Every step matters.

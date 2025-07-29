@@ -1,33 +1,33 @@
 ---
-title: "Episode 1: Napoleon's Sweet Victory"
+title: "Episode 1: Einstein's Simple Genius"
 episodeNumber: 1
-historicalFigure: "Napoleon Bonaparte"
-publishDate: 2024-01-15
+historicalFigure: "Albert Einstein"
+publishDate: 2024-07-29
 youtubeId: "dQw4w9WgXcQ"
-description: "Exploring the Emperor's love for honey cakes and how these simple sweets sustained him through his greatest campaigns"
-relatedRecipes: ["napoleon-honey-cakes"]
+description: "Exploring how simple, nourishing meals fueled the mind of history's greatest physicist"
+relatedRecipes: ["einstein-honey-fried-eggs"]
 ---
 
-## The Emperor's Unexpected Sweet Tooth
+## The Genius's Approach to Food
 
-Welcome to the very first episode of Kaz Mielony! Today we're diving into one of history's most fascinating contradictions: Napoleon Bonaparte's love for simple honey cakes. While he conquered most of Europe with military genius, his personal tastes remained surprisingly humble.
+Welcome to the very first episode of Kaz Mielony! Today we're exploring how Albert Einstein approached food—with the same elegant simplicity he brought to physics. While he revolutionized our understanding of the universe, his eating habits remained refreshingly uncomplicated.
 
-## Why Start with Napoleon?
+## Why Start with Einstein?
 
-Napoleon represents the perfect example of how food connects us to historical figures in unexpected ways. Here was a man who dined with kings and emperors, yet his favorite treat was a simple honey cake that reminded him of his Corsican childhood.
+Einstein represents the perfect example of how the right fuel can support extraordinary thinking. Here was a man who could conceive of relativity and quantum mechanics, yet found profound satisfaction in a perfectly prepared honey-fried egg with mushrooms.
 
-## The Recipe's Journey
+## The Recipe's Philosophy
 
-These honey cakes traveled with Napoleon from Corsica to the palaces of Europe, and finally to his exile on St. Helena. They represent continuity in a life of constant change—a sweet constant in the chaos of empire-building.
+Einstein's breakfast reflects his famous principle: "Everything should be made as simple as possible, but not simpler." Few ingredients, combined with care and attention, create something greater than the sum of their parts—much like his scientific theories.
 
 ## What We Discovered
 
-During filming, I was struck by how the aroma of honey and spices filled the kitchen, just as it would have in Napoleon's field kitchens. These weren't just desserts—they were portable energy, comfort food, and a taste of home all rolled into one.
+During filming, I was struck by how the honey caramelizing in the pan created this beautiful, glossy coating—almost like Einstein was applying his understanding of molecular interactions to breakfast. The sweet-savory balance would have provided sustained energy for those long days contemplating the mysteries of space and time.
 
 ## Historical Cooking Notes
 
-The biggest challenge was sourcing period-appropriate honey. Modern processed honey lacks the complex flavors that Napoleon would have known. We used raw wildflower honey from a local beekeeper, which brought depth and character to the final cakes.
+The biggest challenge was sourcing the same type of acacia honey that Einstein would have preferred. We used a local varietal that brought the right floral notes to complement the earthy mushrooms—creating that perfect harmony he would have appreciated.
 
 ## Next Episode Preview
 
-Join me next time as we explore the Tudor court kitchens and recreate Henry VIII's legendary appetite for roast beef. We'll be cooking for eight—which was probably just a light snack for the notorious king!
+Join me next time as we prepare Einstein's comforting mushroom pasta—a dish that sustained him through some of his most productive years at Princeton!

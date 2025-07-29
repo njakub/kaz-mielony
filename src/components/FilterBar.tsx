@@ -1,3 +1,7 @@
+// FilterBar component - Currently disabled until more recipes are added
+// Uncomment and use when you have 10+ recipes for better navigation
+
+/*
 import { useState } from "react";
 
 interface FilterBarProps {
@@ -79,3 +83,4 @@ export default function FilterBar({ onFilterChange, figures }: FilterBarProps) {
     </div>
   );
 }
+*/

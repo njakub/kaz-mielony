@@ -1,7 +1,8 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../components/Layout.astro';
 import VideoEmbed from '../../components/VideoEmbed.astro';
+import { getCloudinaryUrl } from '../../utils/cloudinary';
 
 export async function getStaticPaths() {
   const recipes = await getCollection('recipes');
@@ -11,7 +12,11 @@ export async function getStaticPaths() {
   }));
 }
 
-const { recipe } = Astro.props;
+type Props = {
+  recipe: CollectionEntry<'recipes'>;
+};
+
+const { recipe } = Astro.props as Props;
 const { Content } = await recipe.render();
 ---
 
@@ -19,26 +24,37 @@ const { Content } = await recipe.render();
   <article class="max-w-5xl mx-auto px-4 py-8">
     <header class="mb-8">
       <div class="mb-4">
-        <a href="/recipes" class="text-amber-600 hover:text-amber-700 font-medium">
+        <a href="/recipes" class="text-primary hover:text-accent font-medium">
           ← Back to Recipes
         </a>
       </div>
       
-      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+      <h1 class="text-4xl md:text-5xl font-bold text-text-light mb-4">
         {recipe.data.title}
       </h1>
       
-      <div class="flex flex-wrap items-center gap-4 text-gray-600 mb-6">
-        <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium">
+      <div class="flex flex-wrap items-center gap-4 text-muted mb-6">
+        <span class="bg-primary text-text-dark px-3 py-1 rounded-full text-sm font-medium">
           {recipe.data.historicalFigure}
         </span>
         <span class="text-sm">{recipe.data.timePeriod}</span>
         <span class="text-sm capitalize">{recipe.data.mealType}</span>
       </div>
       
-      <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+      <p class="text-xl text-text-light/80 mb-8 leading-relaxed">
         {recipe.data.description}
       </p>
+      
+      {recipe.data.image && (
+        <div class="mb-8 rounded-lg overflow-hidden">
+          <img 
+            src={getCloudinaryUrl(recipe.data.image, { width: 1200, height: 600 })}
+            alt={recipe.data.title}
+            class="w-full h-64 md:h-80 object-cover"
+            loading="eager"
+          />
+        </div>
+      )}
       
       {recipe.data.youtubeId && (
         <div class="mb-8">
@@ -50,40 +66,40 @@ const { Content } = await recipe.render();
     <div class="grid lg:grid-cols-4 gap-8">
       <!-- Recipe Info Sidebar -->
       <aside class="lg:col-span-1">
-        <div class="bg-amber-50 p-6 rounded-lg mb-6 sticky top-4">
-          <h3 class="font-bold text-lg mb-4 text-gray-900">Recipe Info</h3>
+        <div class="bg-surface border border-border p-6 rounded-lg mb-6">
+          <h3 class="font-bold text-lg mb-4 text-text-light">Recipe Info</h3>
           <div class="space-y-3 text-sm">
             <div class="flex justify-between">
-              <span class="text-gray-600">Prep Time:</span>
-              <span class="font-medium">{recipe.data.prepTime} min</span>
+              <span class="text-muted">Prep Time:</span>
+              <span class="font-medium text-text-light">{recipe.data.prepTime} min</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600">Cook Time:</span>
-              <span class="font-medium">{recipe.data.cookTime} min</span>
+              <span class="text-muted">Cook Time:</span>
+              <span class="font-medium text-text-light">{recipe.data.cookTime} min</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600">Total Time:</span>
-              <span class="font-medium">{recipe.data.prepTime + recipe.data.cookTime} min</span>
+              <span class="text-muted">Total Time:</span>
+              <span class="font-medium text-text-light">{recipe.data.prepTime + recipe.data.cookTime} min</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600">Serves:</span>
-              <span class="font-medium">{recipe.data.servings}</span>
+              <span class="text-muted">Serves:</span>
+              <span class="font-medium text-text-light">{recipe.data.servings}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600">Difficulty:</span>
-              <span class="font-medium capitalize">{recipe.data.difficulty}</span>
+              <span class="text-muted">Difficulty:</span>
+              <span class="font-medium capitalize text-text-light">{recipe.data.difficulty}</span>
             </div>
           </div>
         </div>
 
         <!-- Ingredients -->
-        <div class="bg-white border rounded-lg p-6 mb-6">
-          <h3 class="font-bold text-lg mb-4 text-gray-900">Ingredients</h3>
+        <div class="bg-surface border border-border rounded-lg p-6 mb-6">
+          <h3 class="font-bold text-lg mb-4 text-text-light">Ingredients</h3>
           <ul class="space-y-2">
             {recipe.data.ingredients.map((ingredient) => (
               <li class="flex items-start text-sm">
-                <span class="text-amber-600 mr-3 mt-1">•</span>
-                <span>{ingredient}</span>
+                <span class="text-primary mr-3 mt-1">•</span>
+                <span class="text-text-light">{ingredient}</span>
               </li>
             ))}
           </ul>
@@ -91,13 +107,13 @@ const { Content } = await recipe.render();
 
         <!-- Equipment -->
         {recipe.data.equipment && recipe.data.equipment.length > 0 && (
-          <div class="bg-white border rounded-lg p-6">
-            <h3 class="font-bold text-lg mb-4 text-gray-900">Equipment</h3>
+          <div class="bg-surface border border-border rounded-lg p-6">
+            <h3 class="font-bold text-lg mb-4 text-text-light">Equipment</h3>
             <ul class="space-y-2">
               {recipe.data.equipment.map((item) => (
                 <li class="flex items-start text-sm">
-                  <span class="text-amber-600 mr-3 mt-1">•</span>
-                  <span>{item}</span>
+                  <span class="text-primary mr-3 mt-1">•</span>
+                  <span class="text-text-light">{item}</span>
                 </li>
               ))}
             </ul>
@@ -107,17 +123,17 @@ const { Content } = await recipe.render();
 
       <!-- Main Content -->
       <main class="lg:col-span-3">
-        <div class="prose prose-lg max-w-none">
+        <div class="prose prose-lg max-w-none text-text-light">
           <Content />
         </div>
 
         <!-- Tags -->
         {recipe.data.tags && recipe.data.tags.length > 0 && (
-          <div class="mt-8 pt-8 border-t">
-            <h3 class="text-lg font-semibold mb-4">Tags</h3>
+          <div class="mt-8 pt-8 border-t border-border">
+            <h3 class="text-lg font-semibold mb-4 text-text-light">Tags</h3>
             <div class="flex flex-wrap gap-2">
               {recipe.data.tags.map((tag) => (
-                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                <span class="bg-surface border border-border text-text-light px-3 py-1 rounded-full text-sm">
                   #{tag}
                 </span>
               ))}

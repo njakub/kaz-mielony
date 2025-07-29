@@ -9,16 +9,16 @@ const sortedEpisodes = episodes.sort((a, b) => b.data.publishDate.getTime() - a.
 <Layout title="All Episodes">
   <div class="max-w-7xl mx-auto px-4 py-8">
     <header class="mb-8">
-      <h1 class="text-4xl font-bold text-gray-900 mb-4">All Episodes</h1>
-      <p class="text-lg text-gray-600">
+      <h1 class="text-4xl font-bold text-text-light mb-4">All Episodes</h1>
+      <p class="text-lg text-text-light/80">
         Watch the full collection of historical cooking adventures
       </p>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {sortedEpisodes.map((episode) => (
-        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-          <div class="aspect-video bg-gray-200">
+        <article class="bg-surface border border-border rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <div class="aspect-video bg-background/20">
             <iframe
               class="w-full h-full"
               src={`https://www.youtube.com/embed/${episode.data.youtubeId}`}
@@ -29,27 +29,27 @@ const sortedEpisodes = episodes.sort((a, b) => b.data.publishDate.getTime() - a.
           </div>
           <div class="p-6">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-amber-600 font-medium">
+              <span class="text-sm text-primary font-medium">
                 Episode {episode.data.episodeNumber}
               </span>
-              <time class="text-sm text-gray-500">
+              <time class="text-sm text-muted">
                 {episode.data.publishDate.toLocaleDateString()}
               </time>
             </div>
             <h3 class="text-xl font-bold mb-3">
-              <a href={`/episodes/${episode.slug}`} class="text-gray-900 hover:text-amber-600 transition-colors">
+              <a href={`/episodes/${episode.slug}`} class="text-text-light hover:text-primary transition-colors">
                 {episode.data.title}
               </a>
             </h3>
-            <p class="text-gray-600 mb-3 font-medium">
+            <p class="text-text-light/80 mb-3 font-medium">
               {episode.data.historicalFigure}
             </p>
-            <p class="text-gray-700 text-sm mb-4 line-clamp-3">
+            <p class="text-text-light/70 text-sm mb-4 line-clamp-3">
               {episode.data.description}
             </p>
             <a 
               href={`/episodes/${episode.slug}`}
-              class="inline-block bg-amber-600 text-white px-4 py-2 rounded font-medium hover:bg-amber-700 transition-colors"
+              class="inline-block bg-primary text-text-dark px-4 py-2 rounded font-medium hover:bg-accent transition-colors"
             >
               Watch Episode
             </a>
@@ -60,7 +60,7 @@ const sortedEpisodes = episodes.sort((a, b) => b.data.publishDate.getTime() - a.
 
     {episodes.length === 0 && (
       <div class="text-center py-16">
-        <p class="text-gray-500 text-lg">No episodes found. Check back soon for new content!</p>
+        <p class="text-muted text-lg">No episodes found. Check back soon for new content!</p>
       </div>
     )}
   </div>
