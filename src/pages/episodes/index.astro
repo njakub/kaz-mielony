@@ -1,0 +1,67 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const episodes = await getCollection('episodes');
+const sortedEpisodes = episodes.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+---
+
+<Layout title="All Episodes">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">All Episodes</h1>
+      <p class="text-lg text-gray-600">
+        Watch the full collection of historical cooking adventures
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {sortedEpisodes.map((episode) => (
+        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <div class="aspect-video bg-gray-200">
+            <iframe
+              class="w-full h-full"
+              src={`https://www.youtube.com/embed/${episode.data.youtubeId}`}
+              title={episode.data.title}
+              frameborder="0"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-amber-600 font-medium">
+                Episode {episode.data.episodeNumber}
+              </span>
+              <time class="text-sm text-gray-500">
+                {episode.data.publishDate.toLocaleDateString()}
+              </time>
+            </div>
+            <h3 class="text-xl font-bold mb-3">
+              <a href={`/episodes/${episode.slug}`} class="text-gray-900 hover:text-amber-600 transition-colors">
+                {episode.data.title}
+              </a>
+            </h3>
+            <p class="text-gray-600 mb-3 font-medium">
+              {episode.data.historicalFigure}
+            </p>
+            <p class="text-gray-700 text-sm mb-4 line-clamp-3">
+              {episode.data.description}
+            </p>
+            <a 
+              href={`/episodes/${episode.slug}`}
+              class="inline-block bg-amber-600 text-white px-4 py-2 rounded font-medium hover:bg-amber-700 transition-colors"
+            >
+              Watch Episode
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    {episodes.length === 0 && (
+      <div class="text-center py-16">
+        <p class="text-gray-500 text-lg">No episodes found. Check back soon for new content!</p>
+      </div>
+    )}
+  </div>
+</Layout>

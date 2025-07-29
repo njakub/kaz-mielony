@@ -1,0 +1,130 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../components/Layout.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
+
+export async function getStaticPaths() {
+  const recipes = await getCollection('recipes');
+  return recipes.map((recipe) => ({
+    params: { slug: recipe.slug },
+    props: { recipe },
+  }));
+}
+
+const { recipe } = Astro.props;
+const { Content } = await recipe.render();
+---
+
+<Layout title={recipe.data.title} description={recipe.data.description}>
+  <article class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <div class="mb-4">
+        <a href="/recipes" class="text-amber-600 hover:text-amber-700 font-medium">
+          ← Back to Recipes
+        </a>
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        {recipe.data.title}
+      </h1>
+      
+      <div class="flex flex-wrap items-center gap-4 text-gray-600 mb-6">
+        <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium">
+          {recipe.data.historicalFigure}
+        </span>
+        <span class="text-sm">{recipe.data.timePeriod}</span>
+        <span class="text-sm capitalize">{recipe.data.mealType}</span>
+      </div>
+      
+      <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+        {recipe.data.description}
+      </p>
+      
+      {recipe.data.youtubeId && (
+        <div class="mb-8">
+          <VideoEmbed videoId={recipe.data.youtubeId} title={recipe.data.title} />
+        </div>
+      )}
+    </header>
+
+    <div class="grid lg:grid-cols-4 gap-8">
+      <!-- Recipe Info Sidebar -->
+      <aside class="lg:col-span-1">
+        <div class="bg-amber-50 p-6 rounded-lg mb-6 sticky top-4">
+          <h3 class="font-bold text-lg mb-4 text-gray-900">Recipe Info</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Prep Time:</span>
+              <span class="font-medium">{recipe.data.prepTime} min</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Cook Time:</span>
+              <span class="font-medium">{recipe.data.cookTime} min</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Total Time:</span>
+              <span class="font-medium">{recipe.data.prepTime + recipe.data.cookTime} min</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Serves:</span>
+              <span class="font-medium">{recipe.data.servings}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Difficulty:</span>
+              <span class="font-medium capitalize">{recipe.data.difficulty}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ingredients -->
+        <div class="bg-white border rounded-lg p-6 mb-6">
+          <h3 class="font-bold text-lg mb-4 text-gray-900">Ingredients</h3>
+          <ul class="space-y-2">
+            {recipe.data.ingredients.map((ingredient) => (
+              <li class="flex items-start text-sm">
+                <span class="text-amber-600 mr-3 mt-1">•</span>
+                <span>{ingredient}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Equipment -->
+        {recipe.data.equipment && recipe.data.equipment.length > 0 && (
+          <div class="bg-white border rounded-lg p-6">
+            <h3 class="font-bold text-lg mb-4 text-gray-900">Equipment</h3>
+            <ul class="space-y-2">
+              {recipe.data.equipment.map((item) => (
+                <li class="flex items-start text-sm">
+                  <span class="text-amber-600 mr-3 mt-1">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </aside>
+
+      <!-- Main Content -->
+      <main class="lg:col-span-3">
+        <div class="prose prose-lg max-w-none">
+          <Content />
+        </div>
+
+        <!-- Tags -->
+        {recipe.data.tags && recipe.data.tags.length > 0 && (
+          <div class="mt-8 pt-8 border-t">
+            <h3 class="text-lg font-semibold mb-4">Tags</h3>
+            <div class="flex flex-wrap gap-2">
+              {recipe.data.tags.map((tag) => (
+                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  </article>
+</Layout>
