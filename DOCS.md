@@ -316,6 +316,19 @@ If needed, add environment variables in your deployment platform:
 - `YOUTUBE_API_KEY`: For enhanced YouTube integration
 - `SITE_URL`: Your production URL
 
+## Quick Start
+
+Your project is now live on GitHub at: **https://github.com/njakub/kaz-mielony**
+
+### Ready for Deployment
+
+The repository is ready for immediate deployment on Vercel or Netlify:
+
+1. **Vercel**: Visit [vercel.com](https://vercel.com), connect your GitHub account, and import the `kaz-mielony` repository
+2. **Netlify**: Visit [netlify.com](https://netlify.com), connect your GitHub account, and deploy the `kaz-mielony` repository
+
+Both platforms will automatically detect Astro and configure the correct build settings.
+
 ## Troubleshooting
 
 ### Common Issues
