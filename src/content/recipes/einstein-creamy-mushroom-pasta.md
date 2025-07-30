@@ -10,6 +10,7 @@ prepTime: 15
 servings: 4
 publishDate: 2024-07-29
 tags: ["german", "pasta", "mushrooms", "comfort-food", "dinner"]
+image: "kaz-mielony/albert-einstein/pasta_luakvz"
 ingredients:
   - "300g linguini (or fettuccine/spaghetti)"
   - "400g chestnut mushrooms"

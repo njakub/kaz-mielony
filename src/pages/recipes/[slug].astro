@@ -46,11 +46,11 @@ const { Content } = await recipe.render();
       </p>
       
       {recipe.data.image && (
-        <div class="mb-8 rounded-lg overflow-hidden">
+        <div class="mb-8 rounded-lg overflow-hidden bg-surface">
           <img 
-            src={getCloudinaryUrl(recipe.data.image, { width: 1200, height: 600 })}
+            src={getCloudinaryUrl(recipe.data.image, { width: 1200, height: 600, crop: 'fill', gravity: 'center' })}
             alt={recipe.data.title}
-            class="w-full h-64 md:h-80 object-cover"
+            class="w-full h-64 md:h-80 object-cover object-center"
             loading="eager"
           />
         </div>

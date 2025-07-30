@@ -10,6 +10,7 @@ prepTime: 10
 servings: 1
 publishDate: 2024-07-29
 tags: ["german", "breakfast", "eggs", "mushrooms", "honey"]
+image: "kaz-mielony/albert-einstein/eggs1_qsfaiw"
 ingredients:
   - "1 sourdough roll (or slice of bread)"
   - "100g chestnut mushrooms"

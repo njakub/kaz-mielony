@@ -10,7 +10,7 @@ prepTime: 5
 servings: 1
 publishDate: 2024-07-29
 tags: ["sandwich", "cheese", "comfort-food", "scientist"]
-image: "2_pzzbdx"
+image: "kaz-mielony/albert-einstein/toasti_vk2zff.png"
 ingredients:
   - "2 slices sourdough bread"
   - "½ cup Gruyère cheese, grated"
