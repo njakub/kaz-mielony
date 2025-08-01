@@ -1,0 +1,163 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../components/Layout.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
+import { getCloudinaryUrl } from '../../utils/cloudinary';
+
+export async function getStaticPaths() {
+  const recipes = await getCollection('recipes');
+  return recipes.map((recipe) => ({
+    params: { path: recipe.slug },
+    props: { recipe },
+  }));
+}
+
+type Props = {
+  recipe: CollectionEntry<'recipes'>;
+};
+
+const { recipe } = Astro.props as Props;
+const { Content } = await recipe.render();
+---
+
+<Layout title={recipe.data.title} description={recipe.data.description}>
+  <article class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <div class="mb-4">
+        <a href="/recipes" class="text-primary hover:text-accent font-medium">
+          ← Back to Recipes
+        </a>
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-2 text-sm text-muted mb-4">
+        <span class="bg-accent/20 text-accent px-2 py-1 rounded">
+          {recipe.data.historicalFigure}
+        </span>
+        <span class="bg-primary/20 text-primary px-2 py-1 rounded">
+          {recipe.data.timePeriod}
+        </span>
+        <span class="bg-secondary/50 text-text-dark px-2 py-1 rounded capitalize">
+          {recipe.data.mealType}
+        </span>
+        <span class="bg-surface/50 text-text-light px-2 py-1 rounded capitalize">
+          {recipe.data.difficulty}
+        </span>
+      </div>
+
+      <h1 class="text-4xl font-bold text-text-light mb-4">{recipe.data.title}</h1>
+      <p class="text-xl text-text-light/80 mb-6">{recipe.data.description}</p>
+
+      {recipe.data.image && (
+        <div class="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
+          <img 
+            src={getCloudinaryUrl(recipe.data.image, { width: 1200, height: 600, crop: 'fill', gravity: 'center' })}
+            alt={recipe.data.title}
+            class="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+      )}
+
+      <div class="flex flex-wrap gap-6 text-sm text-text-light/80 mb-8">
+        <div class="flex items-center">
+          <span class="font-semibold mr-2">Prep:</span>
+          {recipe.data.prepTime} min
+        </div>
+        <div class="flex items-center">
+          <span class="font-semibold mr-2">Cook:</span>
+          {recipe.data.cookTime} min
+        </div>
+        <div class="flex items-center">
+          <span class="font-semibold mr-2">Serves:</span>
+          {recipe.data.servings}
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-8">
+        {recipe.data.tags.map((tag) => (
+          <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
+            #{tag}
+          </span>
+        ))}
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <aside class="lg:col-span-1">
+        <div class="bg-secondary p-6 rounded-lg sticky top-8">
+          <h2 class="text-xl font-bold text-text-dark mb-4">Ingredients</h2>
+          <ul class="space-y-2">
+            {recipe.data.ingredients.map((ingredient) => (
+              <li class="text-text-dark text-sm flex items-start">
+                <span class="text-primary mr-2">•</span>
+                {ingredient}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+
+      <main class="lg:col-span-2">
+        <div class="prose prose-lg prose-invert max-w-none">
+          <Content />
+        </div>
+      </main>
+    </div>
+
+    <footer class="mt-16 pt-8 border-t border-primary/20">
+      <div class="text-center">
+        <p class="text-text-light/60 mb-4">
+          Inspired by {recipe.data.historicalFigure} • {recipe.data.timePeriod}
+        </p>
+        <a 
+          href="/recipes" 
+          class="inline-block bg-primary text-text-dark px-6 py-2 rounded-lg hover:bg-accent transition-colors"
+        >
+          Explore More Recipes
+        </a>
+      </div>
+    </footer>
+  </article>
+</Layout>
+
+<style>
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    @apply text-text-light;
+  }
+  
+  .prose p, .prose li {
+    @apply text-text-light/80;
+  }
+  
+  .prose strong {
+    @apply text-primary font-semibold;
+  }
+  
+  .prose ol > li::marker {
+    @apply text-primary font-bold;
+  }
+  
+  .prose ul > li::marker {
+    @apply text-primary;
+  }
+  
+  .prose ol {
+    @apply list-decimal space-y-2;
+  }
+  
+  .prose ul {
+    @apply list-disc space-y-1;
+  }
+  
+  .prose ol > li {
+    @apply pl-2;
+  }
+  
+  .prose ul > li {
+    @apply pl-2;
+  }
+
+  .prose h3 {
+    @apply text-primary text-lg font-semibold mt-8 mb-4;
+  }
+</style>
