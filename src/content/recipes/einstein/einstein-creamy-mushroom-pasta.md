@@ -1,16 +1,17 @@
 ---
 title: "Einstein's Creamy Mushroom Pasta"
-description: "A comforting pasta dish that provided the renowned physicist with the energy needed for his most important discoveries"
+description: "A comforting pasta dish that would have satisfied the brilliant physicist during his Princeton years"
 historicalFigure: "Albert Einstein"
-timePeriod: "Early 20th Century"
-mealType: "dinner"
+timePeriod: "Mid 20th Century"
+mealType: "lunch"
 difficulty: "medium"
-cookTime: 20
+cookTime: 25
 prepTime: 15
-servings: 4
+servings: 2
 publishDate: 2024-07-29
-tags: ["german", "pasta", "mushrooms", "comfort-food", "dinner"]
+tags: ["german", "pasta", "mushrooms", "cream", "comfort-food"]
 image: "kaz-mielony/albert-einstein/pasta_luakvz"
+episode: 1
 ingredients:
   - "300g linguini (or fettuccine/spaghetti)"
   - "400g chestnut mushrooms"
@@ -22,13 +23,6 @@ ingredients:
   - "1 cup reserved pasta cooking water"
   - "4 tbsp butter"
   - "2 tbsp extra virgin olive oil"
-equipment:
-  - "Large pot for pasta"
-  - "Large skillet"
-  - "Colander"
-  - "Sharp knife"
-  - "Cutting board"
-  - "Wooden spoon"
 ---
 
 ## Instructions
@@ -56,13 +50,3 @@ equipment:
 8. **Combine pasta and sauce**: Add the drained pasta to the skillet and toss thoroughly to coat every strand. Add more pasta water gradually if needed to help the sauce cling to the pasta.
 
 9. **Final seasoning**: Taste and adjust with salt and freshly ground black pepper. The sauce should be creamy but not heavy, with the mushrooms providing earthy depth.
-
-### Serve
-
-10. **Plate and garnish**: Divide among four warmed bowls. Top with the remaining fresh parsley and extra pecorino romano for those who want it.
-
-## Einstein's Wisdom
-
-This dish embodies Einstein's appreciation for simplicity and quality—a few excellent ingredients combined with proper technique to create something memorable. The creamy richness would have provided the sustained energy needed for his evening calculations, while the earthy mushrooms grounded the dish in the kind of honest flavors he preferred.
-
-Serve immediately while the pasta is hot and the sauce is at its silkiest, perfect for sharing with fellow thinkers over discussions of science and philosophy.

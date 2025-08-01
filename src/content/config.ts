@@ -18,6 +18,7 @@ const recipesCollection = defineCollection({
     ingredients: z.array(z.string()),
     equipment: z.array(z.string()).optional(),
     image: z.string().optional(),
+    episode: z.number().optional(), // Which episode featured this recipe
   }),
 });
 

@@ -11,6 +11,7 @@ servings: 1
 publishDate: 2024-07-29
 tags: ["german", "breakfast", "eggs", "mushrooms", "honey"]
 image: "kaz-mielony/albert-einstein/eggs1_qsfaiw"
+episode: 1
 ingredients:
   - "1 sourdough roll (or slice of bread)"
   - "100g chestnut mushrooms"
@@ -19,22 +20,11 @@ ingredients:
   - "1 tbsp honey (plus extra for drizzling; Acacia honey preferred)"
   - "4 tbsp butter"
   - "1 tbsp extra virgin olive oil"
-equipment:
-  - "Frying pan"
-  - "Sharp knife"
-  - "Cutting board"
-  - "Toaster"
 ---
 
 ## The Genius's Simple Breakfast
 
 Albert Einstein's daily routine included a simple yet satisfying breakfast that provided sustained energy for his groundbreaking work. This combination of honey-sweetened eggs with savory mushrooms reflects Einstein's preference for uncomplicated, nourishing meals that didn't distract from his scientific pursuits.
-
-## Historical Context
-
-Einstein was known for his modest eating habits, often preferring simple, wholesome foods over elaborate cuisine. This breakfast dish represents the kind of meal he might have enjoyed in his Princeton home, combining protein-rich eggs with the natural sweetness of honey—a combination that would have reminded him of traditional German breakfast fare from his youth.
-
-The use of honey in savory dishes was common in Central European cooking, and Einstein's appreciation for such combinations reflects his cultural background and practical approach to nutrition.
 
 ## Instructions
 
@@ -65,9 +55,3 @@ The use of honey in savory dishes was common in Central European cooking, and Ei
 9. **Plate the dish**: Place the toast on a plate, top with the honey-glazed eggs, then spoon the garlic mushrooms alongside.
 
 10. **Finish**: Sprinkle with the remaining fresh parsley and drizzle a little extra honey over the top for added sweetness.
-
-## Einstein's Touch
-
-This dish embodies Einstein's philosophy of elegant simplicity—few ingredients combined thoughtfully to create something greater than the sum of its parts. The sweet-savory balance would have appealed to his scientific mind, which appreciated harmony and proportion in all things.
-
-Serve immediately while the eggs are still warm and the honey glaze is glistening, just as Einstein would have enjoyed it before settling into a morning of contemplating the mysteries of the universe.
