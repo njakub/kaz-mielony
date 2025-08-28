@@ -64,10 +64,4 @@ This meal reflects Monroe's complicated relationship with food - choosing ingred
 
 12. **Eat as Monroe did**: Alternate bites of the rich, mineral-flavored liver with the sweet crunch of raw carrot.
 
-## Marilyn's Discipline
-
-This meal represents Monroe's attempt at nutritional discipline - liver being one of the most nutrient-dense foods available, providing iron, vitamin A, and protein. The raw carrots added fiber and natural sweetness while keeping calories low.
-
-The combination is admittedly challenging, requiring a strong constitution and perhaps reflecting Monroe's complex relationship with food and her body image during Hollywood's golden age.
-
 **Note**: Ensure liver is from a reputable source and cooked to at least 160°F (71°C) internal temperature for food safety.

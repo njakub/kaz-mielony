@@ -1,5 +1,5 @@
 ---
-title: "Marilyn's Simple Spaghetti Pomodoro"
+title: "Marilyn's Simple Spaghetti al Pomodoro"
 description: "Marilyn Monroe's surprisingly simple lunch - spaghetti with only blended tomatoes and olive oil"
 historicalFigure: "Marilyn Monroe"
 timePeriod: "1950s Hollywood"
@@ -13,16 +13,12 @@ tags: ["hollywood", "pasta", "simple", "tomatoes", "1950s", "authentic"]
 image: "kaz-mielony/marilyn-monroe/spaghetti-pomodoro"
 episode: 2
 ingredients:
-  - "100g spaghetti"
-  - "400g ripe tomatoes (or 1 can whole tomatoes)"
+  - "300g spaghetti"
+  - "400g cher tomatoes (or 1 can whole tomatoes)"
   - "3 tbsp extra virgin olive oil"
-  - "1 clove garlic (optional)"
+  - "2 cloves garlic"
   - "Salt to taste"
-  - "Fresh basil leaves (optional)"
-equipment:
-  - "Large pot for pasta"
-  - "Blender or food processor"
-  - "Large skillet"
+  - "Fresh basil leaves"
 ---
 
 ## Marilyn's Simple Approach
@@ -47,7 +43,7 @@ This was Marilyn Monroe's actual lunch preference - a surprisingly simple spaghe
 
 ### Combine and Serve
 
-6. **Add tomato blend**: Pour the blended tomatoes into the skillet with oil. Season with salt and simmer for 8-10 minutes until slightly thickened.
+6. **Add tomato blend**: Pour the blended tomatoes into the skillet with oil. Season with salt and simmer for 2-3 minutes until slightly thickened.
 
 7. **Combine pasta**: Add the drained spaghetti to the tomato sauce. Toss gently, adding pasta water if needed to help the sauce coat the pasta.
 
