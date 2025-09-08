@@ -10,7 +10,7 @@ prepTime: 2
 servings: 1
 publishDate: 2024-08-14
 tags: ["hollywood", "breakfast", "protein", "simple", "1950s", "authentic"]
-image: "kaz-mielony/marilyn-monroe/warm-milk-egg"
+image: "kaz-mielony/marilyn-monroe/98dc1687-5139-4e3d-9232-87d5edce72db"
 episode: 2
 ingredients:
   - "1 cup whole milk"
@@ -57,4 +57,15 @@ The warm milk made the raw eggs more palatable while the protein helped stabiliz
 
 Monroe reportedly drank this every morning as part of her beauty and health routine. She believed the raw eggs gave her protein for energy and healthy skin, while the warm milk was comforting and helped settle her often-nervous stomach before facing the cameras.
 
-**Safety Note**: This recipe contains raw eggs. Use only the freshest, highest-quality eggs, preferably pasteurized. Avoid if pregnant, elderly, or immunocompromised.
+## Important Safety Information
+
+**⚠️ Raw Egg Safety Warning**: This recipe contains raw eggs and carries inherent food safety risks. Please follow these guidelines:
+
+- **Use only the freshest, highest-quality eggs** from a reputable source
+- **Check expiration dates** and ensure eggs are properly refrigerated
+- **Consider pasteurized eggs** for reduced salmonella risk
+- **Avoid if you are**: pregnant, elderly, immunocompromised, or have any underlying health conditions
+- **Consume immediately** - do not store or save leftovers
+- **Wash hands thoroughly** before and after handling raw eggs
+
+**Modern Alternative**: Consider using pasteurized liquid eggs or egg white powder for a safer version while maintaining the historical authenticity of Marilyn's routine.

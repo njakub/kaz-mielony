@@ -8,11 +8,12 @@ episodeNumber: 3
 youtubeId: "Gm3gUW09KUY"
 image: "kaz-mielony/freddie-mercury/episode_hero"
 tags: ["freddie-mercury", "queen", "parsi", "british", "musician"]
-relatedRecipes: [
-  "freddie-mercury/freddie-homemade-jam-marmalade-toast",
-  "freddie-mercury/freddie-mediterranean-lentil-soup", 
-  "freddie-mercury/freddie-chicken-dhansak"
-]
+relatedRecipes:
+  [
+    "freddie-mercury/freddie-homemade-jam-marmalade-toast",
+    "freddie-mercury/freddie-mediterranean-lentil-soup",
+    "freddie-mercury/freddie-chicken-dhansak",
+  ]
 ---
 
 ## Introduction

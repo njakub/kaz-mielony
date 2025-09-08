@@ -10,7 +10,7 @@ prepTime: 5
 servings: 1
 publishDate: 2024-08-14
 tags: ["hollywood", "liver", "protein", "challenging", "1950s", "authentic"]
-image: "kaz-mielony/marilyn-monroe/broiled-liver"
+image: "kaz-mielony/marilyn-monroe/024a49f7-7bbb-49a9-9df9-a806431c8cbe"
 episode: 2
 ingredients:
   - "1 slice calf liver (about 150g/5oz)"

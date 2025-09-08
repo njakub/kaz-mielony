@@ -10,7 +10,7 @@ prepTime: 10
 servings: 1
 publishDate: 2024-08-14
 tags: ["hollywood", "pasta", "simple", "tomatoes", "1950s", "authentic"]
-image: "kaz-mielony/marilyn-monroe/spaghetti-pomodoro"
+image: "kaz-mielony/marilyn-monroe/49e5820b-ab84-451a-a0cc-54456844ab2d"
 episode: 2
 ingredients:
   - "300g spaghetti"
