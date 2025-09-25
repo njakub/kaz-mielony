@@ -11,7 +11,7 @@ const recipesCollection = defineCollection({
     difficulty: z.enum(["easy", "medium", "hard"]),
     cookTime: z.number(),
     prepTime: z.number(),
-    servings: z.number(),
+    servings: z.union([z.number(), z.string()]),
     youtubeId: z.string().optional(),
     publishDate: z.date(),
     tags: z.array(z.string()),
