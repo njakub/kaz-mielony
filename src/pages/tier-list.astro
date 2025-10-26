@@ -1,0 +1,91 @@
+---
+import Layout from "../components/Layout.astro";
+import { getCollection } from "astro:content";
+
+// Get all recipes for reference
+const allRecipes = await getCollection("recipes");
+
+// Define recipe type
+type Recipe = {
+  slug: string;
+  name: string;
+  image: string;
+};
+
+// Define your tier list - add recipe slugs and assign them to tiers
+const tierList: Record<string, Recipe[]> = {
+  S: [],
+  A: [],
+  B: [],
+  C: [
+    {
+      slug: "pele/pele-xinxim-de-galinha",
+      name: "Xinxim de Galinha",
+      image: "kaz-mielony/pele/icon",
+    },
+  ],
+  D: [],
+};
+
+const tiers = [
+  { letter: "S", label: "Legendary", color: "bg-red-400" },
+  { letter: "A", label: "Excellent", color: "bg-orange-300" },
+  { letter: "B", label: "Good", color: "bg-yellow-200" },
+  { letter: "C", label: "Decent", color: "bg-lime-200" },
+  { letter: "D", label: "Meh", color: "bg-green-300" },
+];
+---
+
+<Layout title="Recipe Tier List - Kaz Mielony">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-2 text-center">Recipe Tier List</h1>
+    <p class="text-gray-600 text-center mb-8">
+       Rankings the dishes featured in the episodes based on taste. Thats my taste.
+    </p>
+
+    <div class="space-y-2">
+      {
+        tiers.map((tier) => (
+          <div class="flex gap-2 items-stretch">
+            {/* Tier Label */}
+            <div
+              class={`${tier.color} w-24 flex flex-col items-center justify-center font-bold rounded-lg shadow-sm`}
+            >
+              <span class="text-3xl">{tier.letter}</span>
+              <span class="text-xs text-gray-700">{tier.label}</span>
+            </div>
+
+            {/* Tier Content */}
+            <div class="flex-1 bg-gray-100 rounded-lg p-4 min-h-[120px] flex items-center gap-3 flex-wrap">
+              {tierList[tier.letter]?.map((recipe) => (
+                <a
+                  href={`/recipes/${recipe.slug}`}
+                  class="group relative block"
+                  title={recipe.name}
+                >
+                  <img
+                    src={`https://res.cloudinary.com/dfxheaozx/image/upload/w_120/${recipe.image}.png`}
+                    alt={recipe.name}
+                    class="w-24 h-24 object-contain group-hover:scale-105 transition-all"
+                  />
+                  <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white text-xs p-1 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity text-center">
+                    {recipe.name}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-8 text-center text-sm text-gray-600">
+      <p>
+        Rankings the dishes featured in the episodes based on taste. Thats my taste.
+      </p>
+      <p class="mt-2">
+        Click on any dish to see the full recipe and historical context.
+      </p>
+    </div>
+  </div>
+</Layout>
