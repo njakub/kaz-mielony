@@ -3,7 +3,6 @@ title: "Al Capone's Walnut Pasta"
 historicalFigure: "Al Capone"
 publishDate: 2025-11-14
 episodeNumber: 9
-youtubeId: ""
 youtubeId: "ZmiPeo2zRUo"
 image: "kaz-mielony/al-capone/IMG_1466_tmzy6b"
 description: "Cooking like a gangster with the silky walnut pasta supposedly loved by Chicago crime boss Al Capone, blending Old World comfort with Prohibition-era swagger."
