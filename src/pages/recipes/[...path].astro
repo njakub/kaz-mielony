@@ -91,14 +91,25 @@ const { Content } = await recipe.render();
       <aside class="lg:col-span-1">
         <div class="bg-secondary p-6 rounded-lg sticky top-8">
           <h2 class="text-xl font-bold text-text-dark mb-4">Ingredients</h2>
-          <ul class="space-y-2">
-            {recipe.data.ingredients.map((ingredient) => (
-              <li class="text-text-dark text-sm flex items-start">
-                <span class="text-primary mr-2">•</span>
-                {ingredient}
-              </li>
-            ))}
-          </ul>
+          <div class="space-y-4">
+            {recipe.data.ingredients.map((ingredient) => {
+              // Check if this is a section header (starts with ##)
+              if (ingredient.startsWith('##')) {
+                return (
+                  <h3 class="text-base font-bold text-text-dark mt-6 mb-2 first:mt-0">
+                    {ingredient.replace('##', '').trim()}
+                  </h3>
+                );
+              }
+              // Regular ingredient
+              return (
+                <div class="text-text-dark text-sm flex items-start">
+                  <span class="text-primary mr-2">•</span>
+                  <span>{ingredient}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </aside>
 
