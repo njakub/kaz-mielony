@@ -3,8 +3,8 @@ title: "Ozzy Osbourne's Barbacoa Burrito"
 historicalFigure: "Ozzy Osbourne"
 publishDate: 2024-10-31
 episodeNumber: 8
-youtubeId: ""
-image: "kaz-mielony/ozzy/episode_hero"
+youtubeId: "u0bB1unmkGY"
+image: "kaz-mielony/ozzy-osbourne/20251029_192552_uywpd7"
 description: "Recreating the exact Chipotle burrito order of heavy metal legend Ozzy Osbourne - barbacoa beef, pinto beans, white rice, cheese, sour cream, and medium salsa."
 relatedRecipes:
   - "ozzy-osbourne/ozzy-barbacoa-burrito"

@@ -11,7 +11,7 @@ servings: "10-12"
 publishDate: 2024-10-31
 tags:
   ["mexican", "burrito", "chipotle", "barbacoa", "beef", "braised", "tex-mex"]
-image: "kaz-mielony/ozzy/burrito"
+image: "kaz-mielony/ozzy-osbourne/20251029_192552_uywpd7"
 episode: 8
 ingredients:
   - "## Barbacoa Beef"

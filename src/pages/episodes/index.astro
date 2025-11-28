@@ -3,7 +3,11 @@ import Layout from '../../components/Layout.astro';
 import { getCollection } from 'astro:content';
 
 const episodes = await getCollection('episodes');
-const sortedEpisodes = episodes.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+const sortedEpisodes = episodes.sort((a, b) => {
+  const dateDiff = b.data.publishDate.getTime() - a.data.publishDate.getTime();
+  if (dateDiff !== 0) return dateDiff;
+  return (b.data.episodeNumber ?? 0) - (a.data.episodeNumber ?? 0);
+});
 ---
 
 <Layout title="All Episodes">
