@@ -89,9 +89,9 @@ const { Content } = await recipe.render();
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <aside class="lg:col-span-1">
-        <div class="bg-secondary p-6 rounded-lg sticky top-8">
-          <h2 class="text-xl font-bold text-text-dark mb-4">Ingredients</h2>
-          <div class="space-y-4">
+        <div class="bg-secondary p-6 rounded-lg sticky top-8 max-h-[calc(100vh-4rem)] flex flex-col">
+          <h2 class="text-xl font-bold text-text-dark mb-4 flex-shrink-0">Ingredients</h2>
+          <div class="space-y-4 overflow-y-auto pr-2 -mr-2">
             {recipe.data.ingredients.map((ingredient) => {
               // Check if this is a section header (starts with ##)
               if (ingredient.startsWith('##')) {
