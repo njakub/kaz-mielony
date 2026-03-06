@@ -1,38 +1,45 @@
 ---
 import Layout from "../components/Layout.astro";
-import { getCollection } from "astro:content";
 
-// Get all recipes for reference
-const allRecipes = await getCollection("recipes");
+// Fetch all images from the country-icons Cloudinary folder at build time
+const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfxheaozx";
+const apiKey = import.meta.env.CLOUDINARY_API_KEY;
+const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
 
-// Define recipe type
-type Recipe = {
-  slug: string;
-  name: string;
-  image: string;
-};
+type CloudinaryResource = { public_id: string; secure_url: string };
 
-// Define your tier list - add recipe slugs and assign them to tiers
-const tierList: Record<string, Recipe[]> = {
-  S: [],
-  A: [],
-  B: [],
-  C: [
-    {
-      slug: "pele/pele-xinxim-de-galinha",
-      name: "Xinxim de Galinha",
-      image: "kaz-mielony/pele/icon",
-    },
-  ],
-  D: [],
-};
+async function fetchCountryIcons(): Promise<CloudinaryResource[]> {
+  const creds = btoa(`${apiKey}:${apiSecret}`);
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?type=upload&prefix=kaz-mielony/country-icons&max_results=500`;
+  const res = await fetch(url, { headers: { Authorization: `Basic ${creds}` } });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.resources ?? [];
+}
 
-const tiers = [
-  { letter: "S", label: "Legendary", color: "bg-red-400" },
-  { letter: "A", label: "Excellent", color: "bg-orange-300" },
-  { letter: "B", label: "Good", color: "bg-yellow-200" },
-  { letter: "C", label: "Decent", color: "bg-lime-200" },
-  { letter: "D", label: "Meh", color: "bg-green-300" },
+const icons = await fetchCountryIcons();
+
+const allRecipeItems = icons.map((r) => {
+  // Extract filename without extension as display name, e.g. "Koftbullar_ztgwp2" → "Koftbullar"
+  const filename = r.public_id.split("/").pop() ?? r.public_id;
+  const name = filename.replace(/_[a-z0-9]+$/i, "").replace(/-/g, " ");
+  return {
+    id: r.public_id,
+    name,
+    image: `https://res.cloudinary.com/dfxheaozx/image/upload/w_160/${r.public_id}.png`,
+    href: null,
+  };
+});
+
+// No hard-coded starting positions for icons
+const initialAssignments: Record<string, string> = {};
+
+const tierConfig = [
+  { letter: "S", label: "Legendary", color: "#f87171" },
+  { letter: "A", label: "Excellent", color: "#fdba74" },
+  { letter: "B", label: "Good", color: "#fef08a" },
+  { letter: "C", label: "Decent", color: "#d9f99d" },
+  { letter: "D", label: "Meh", color: "#86efac" },
 ];
 ---
 
@@ -40,52 +47,303 @@ const tiers = [
   <div class="max-w-6xl mx-auto px-4 py-12">
     <h1 class="text-4xl font-bold mb-2 text-center">Recipe Tier List</h1>
     <p class="text-gray-600 text-center mb-8">
-       Rankings the dishes featured in the episodes based on taste. Thats my taste.
+      My personal rankings. Drag dishes between tiers — or drop an image file
+      onto any row to add it.
     </p>
 
-    <div class="space-y-2">
+    <!-- Tier rows -->
+    <div class="space-y-2" id="tier-rows">
       {
-        tiers.map((tier) => (
+        tierConfig.map((tier) => (
           <div class="flex gap-2 items-stretch">
-            {/* Tier Label */}
             <div
-              class={`${tier.color} w-24 flex flex-col items-center justify-center font-bold rounded-lg shadow-sm`}
+              class="w-24 flex-shrink-0 flex flex-col items-center justify-center font-bold rounded-lg shadow-sm select-none"
+              style={`background-color: ${tier.color};`}
             >
               <span class="text-3xl">{tier.letter}</span>
               <span class="text-xs text-gray-700">{tier.label}</span>
             </div>
-
-            {/* Tier Content */}
-            <div class="flex-1 bg-gray-100 rounded-lg p-4 min-h-[120px] flex items-center gap-3 flex-wrap">
-              {tierList[tier.letter]?.map((recipe) => (
-                <a
-                  href={`/recipes/${recipe.slug}`}
-                  class="group relative block"
-                  title={recipe.name}
-                >
-                  <img
-                    src={`https://res.cloudinary.com/dfxheaozx/image/upload/w_120/${recipe.image}.png`}
-                    alt={recipe.name}
-                    class="w-24 h-24 object-contain group-hover:scale-105 transition-all"
-                  />
-                  <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white text-xs p-1 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity text-center">
-                    {recipe.name}
-                  </div>
-                </a>
-              ))}
-            </div>
+            <div
+              class="tier-zone flex-1 rounded-lg p-3 min-h-[156px] flex items-center content-start gap-2 flex-wrap"
+              data-tier={tier.letter}
+              style="background-color: #2a2a2a;"
+            />
           </div>
         ))
       }
     </div>
 
-    <div class="mt-8 text-center text-sm text-gray-600">
-      <p>
-        Rankings the dishes featured in the episodes based on taste. Thats my taste.
-      </p>
-      <p class="mt-2">
-        Click on any dish to see the full recipe and historical context.
-      </p>
+    <!-- Unranked pool -->
+    <div class="mt-6">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+        Unranked
+      </h2>
+      <div
+        id="unranked-pool"
+        class="tier-zone border-2 border-dashed border-gray-600 rounded-lg p-3 min-h-[156px] flex items-center content-start gap-2 flex-wrap"
+        style="background-color: #2a2a2a;"
+        data-tier="unranked"
+      >
+      </div>
     </div>
+
+    <div class="mt-4 flex justify-end">
+      <button
+        id="reset-btn"
+        class="text-sm text-gray-400 hover:text-red-500 transition-colors"
+      >
+        Reset to defaults
+      </button>
+    </div>
+
+    <p class="mt-6 text-center text-sm text-gray-500">
+      Click a dish to view the full recipe.
+    </p>
   </div>
 </Layout>
+
+<style>
+  .tier-zone.drag-over {
+    outline: 2px solid #60a5fa;
+    background-color: #1e3a5f;
+  }
+  .tier-card {
+    position: relative;
+    cursor: grab;
+    user-select: none;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    width: 140px;
+    height: 140px;
+    flex-shrink: 0;
+    transition: box-shadow 0.15s;
+  }
+  .tier-card:active {
+    cursor: grabbing;
+  }
+  .tier-card.dragging {
+    opacity: 0.35;
+  }
+  .tier-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    transition: transform 0.15s;
+  }
+  .tier-card:hover img {
+    transform: scale(1.07);
+  }
+
+</style>
+
+<script define:vars={{ allRecipeItems, initialAssignments }}>
+  const STORAGE_KEY = "kaz-tier-v3";
+
+  /* ── Persistence ─────────────────────────────────────── */
+  function loadState() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function saveState() {
+    const tiers = {};
+    document.querySelectorAll(".tier-zone").forEach((zone) => {
+      tiers[zone.dataset.tier] = [
+        ...zone.querySelectorAll(".tier-card"),
+      ].map((c) => c.dataset.id);
+    });
+
+    const externalItems = {};
+    document.querySelectorAll(".tier-card[data-external]").forEach((c) => {
+      externalItems[c.dataset.id] = {
+        name: c.dataset.name,
+        image: c.dataset.image,
+      };
+    });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ tiers, externalItems })
+    );
+  }
+
+  /* ── Card factory ────────────────────────────────────── */
+  let draggingId = null;
+
+  function createCard({ id, name, image, href, external }) {
+    const card = document.createElement("div");
+    card.className = "tier-card";
+    card.draggable = true;
+    card.dataset.id = id;
+    card.dataset.name = name;
+    card.dataset.image = image;
+    if (external) card.dataset.external = "1";
+
+    const img = document.createElement("img");
+    img.src = image;
+    img.alt = name;
+    img.draggable = false;
+
+    card.appendChild(img);
+
+    if (href) {
+      card.addEventListener("click", () => {
+        if (!draggingId) window.location.href = href;
+      });
+    }
+
+    card.addEventListener("dragstart", (e) => {
+      draggingId = id;
+      e.dataTransfer.setData("text/plain", id);
+      e.dataTransfer.effectAllowed = "move";
+      requestAnimationFrame(() => card.classList.add("dragging"));
+    });
+
+    card.addEventListener("dragend", () => {
+      draggingId = null;
+      card.classList.remove("dragging");
+    });
+
+    return card;
+  }
+
+  /* ── Drop zone wiring ────────────────────────────────── */
+  function wireZone(zone) {
+    let counter = 0;
+
+    zone.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      counter++;
+      zone.classList.add("drag-over");
+    });
+
+    zone.addEventListener("dragleave", () => {
+      counter = Math.max(0, counter - 1);
+      if (counter === 0) zone.classList.remove("drag-over");
+    });
+
+    zone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    });
+
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      counter = 0;
+      zone.classList.remove("drag-over");
+
+      // Case 1: moving an existing card between tiers
+      if (draggingId) {
+        const card = document.querySelector(
+          `.tier-card[data-id="${CSS.escape(draggingId)}"]`
+        );
+        if (card) {
+          zone.appendChild(card);
+          saveState();
+        }
+        return;
+      }
+
+      // Case 2: image file(s) dropped from the OS
+      const files = [...(e.dataTransfer.files || [])].filter((f) =>
+        f.type.startsWith("image/")
+      );
+      if (files.length) {
+        files.forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const id =
+              "ext_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+            const card = createCard({
+              id,
+              name: file.name.replace(/\.[^.]+$/, ""),
+              image: ev.target.result,
+              href: null,
+              external: true,
+            });
+            zone.appendChild(card);
+            saveState();
+          };
+          reader.readAsDataURL(file);
+        });
+        return;
+      }
+
+      // Case 3: image URL dragged from another browser tab
+      const rawUri =
+        e.dataTransfer.getData("text/uri-list") ||
+        e.dataTransfer.getData("text/plain");
+      if (rawUri && /^https?:\/\/.+/i.test(rawUri)) {
+        const id = "ext_" + Date.now();
+        const card = createCard({
+          id,
+          name: "Custom image",
+          image: rawUri,
+          href: null,
+          external: true,
+        });
+        zone.appendChild(card);
+        saveState();
+      }
+    });
+  }
+
+  /* ── Bootstrap ───────────────────────────────────────── */
+  document.addEventListener("DOMContentLoaded", () => {
+    const zones = document.querySelectorAll(".tier-zone");
+    const unranked = document.getElementById("unranked-pool");
+
+    const recipeMap = Object.fromEntries(allRecipeItems.map((r) => [r.id, r]));
+    const savedState = loadState();
+    const assigned = new Set();
+
+    if (savedState?.tiers) {
+      const ext = savedState.externalItems || {};
+      zones.forEach((zone) => {
+        const ids = savedState.tiers[zone.dataset.tier] || [];
+        ids.forEach((id) => {
+          assigned.add(id);
+          let card;
+          if (recipeMap[id]) {
+            card = createCard({ ...recipeMap[id], external: false });
+          } else if (ext[id]) {
+            card = createCard({ id, ...ext[id], href: null, external: true });
+          }
+          if (card) zone.appendChild(card);
+        });
+      });
+    } else {
+      // First visit — apply hard-coded assignments
+      Object.entries(initialAssignments).forEach(([id, tier]) => {
+        if (!recipeMap[id]) return;
+        const zone = document.querySelector(
+          `.tier-zone[data-tier="${tier}"]`
+        );
+        if (zone) {
+          zone.appendChild(createCard({ ...recipeMap[id], external: false }));
+          assigned.add(id);
+        }
+      });
+    }
+
+    // Everything else lands in the unranked pool
+    allRecipeItems.forEach((r) => {
+      if (!assigned.has(r.id)) {
+        unranked.appendChild(createCard({ ...r, external: false }));
+      }
+    });
+
+    zones.forEach(wireZone);
+
+    document.getElementById("reset-btn").addEventListener("click", () => {
+      if (!confirm("Reset tier list to defaults?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    });
+  });
+</script>
