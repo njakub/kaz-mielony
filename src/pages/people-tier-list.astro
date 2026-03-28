@@ -1,7 +1,6 @@
 ---
 import Layout from "../components/Layout.astro";
 
-// Fetch all images from the country-icons Cloudinary folder at build time
 const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME || "dfxheaozx";
 const apiKey = import.meta.env.CLOUDINARY_API_KEY;
 const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
@@ -9,19 +8,18 @@ const passwordHash = import.meta.env.PUBLIC_TIER_PASSWORD_HASH ?? "";
 
 type CloudinaryResource = { public_id: string; secure_url: string };
 
-async function fetchCountryIcons(): Promise<CloudinaryResource[]> {
+async function fetchPeopleIcons(): Promise<CloudinaryResource[]> {
   const creds = btoa(`${apiKey}:${apiSecret}`);
-  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?type=upload&prefix=kaz-mielony/country-icons&max_results=500`;
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?type=upload&prefix=kaz-mielony/people-icons&max_results=500`;
   const res = await fetch(url, { headers: { Authorization: `Basic ${creds}` } });
   if (!res.ok) return [];
   const data = await res.json();
   return data.resources ?? [];
 }
 
-const icons = await fetchCountryIcons();
+const icons = await fetchPeopleIcons();
 
 const allRecipeItems = icons.map((r) => {
-  // Extract filename without extension as display name, e.g. "Koftbullar_ztgwp2" → "Koftbullar"
   const filename = r.public_id.split("/").pop() ?? r.public_id;
   const name = filename.replace(/_[a-z0-9]+$/i, "").replace(/-/g, " ");
   return {
@@ -32,7 +30,6 @@ const allRecipeItems = icons.map((r) => {
   };
 });
 
-// No hard-coded starting positions for icons
 const initialAssignments: Record<string, string> = {};
 
 const tierConfig = [
@@ -44,12 +41,11 @@ const tierConfig = [
 ];
 ---
 
-<Layout title="National Dishes Tier List - Kaz Mielony">
+<Layout title="People Tier List - Kaz Mielony">
   <div class="max-w-6xl mx-auto px-4 py-12">
-    <h1 class="text-4xl font-bold mb-2 text-center">National Dishes Tier List</h1>
+    <h1 class="text-4xl font-bold mb-2 text-center">People Tier List</h1>
     <p class="text-gray-600 text-center mb-8">
-      My personal rankings. Drag dishes between tiers — or drop an image file
-      onto any row to add it.
+      My personal rankings of the historical figures featured on the channel. Drag to rank — or drop an image onto any row to add someone new.
     </p>
 
     <!-- Tier rows -->
@@ -102,7 +98,7 @@ const tierConfig = [
     </div>
 
     <p class="mt-6 text-center text-sm text-gray-500">
-      Click a dish to view the full recipe.
+      Click a person to view their episode.
     </p>
   </div>
 </Layout>
@@ -149,11 +145,10 @@ const tierConfig = [
   .tier-card:hover img {
     transform: scale(1.07);
   }
-
 </style>
 
 <script define:vars={{ allRecipeItems, initialAssignments, passwordHash }}>
-  const STORAGE_KEY = "kaz-tier-v3";
+  const STORAGE_KEY = "kaz-people-tier-v1";
 
   /* ── Auth ─────────────────────────────────────────────── */
   const SESSION_KEY = "kaz-tier-unlocked";
@@ -358,7 +353,6 @@ const tierConfig = [
         });
       });
     } else {
-      // First visit — apply hard-coded assignments
       Object.entries(initialAssignments).forEach(([id, tier]) => {
         if (!recipeMap[id]) return;
         const zone = document.querySelector(
@@ -371,7 +365,6 @@ const tierConfig = [
       });
     }
 
-    // Everything else lands in the unranked pool
     allRecipeItems.forEach((r) => {
       if (!assigned.has(r.id)) {
         unranked.appendChild(createCard({ ...r, external: false }));
