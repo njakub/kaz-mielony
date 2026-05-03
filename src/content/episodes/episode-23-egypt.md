@@ -3,7 +3,7 @@ title: "Egyptian Koshari"
 historicalFigure: "Egypt"
 episodeNumber: 23
 publishDate: 2026-04-18
-youtubeId: "tbd"
+youtubeId: "X-Oql8YIL-A"
 thumbnail: "https://res.cloudinary.com/dfxheaozx/image/upload/v1776507906/kaz-mielony/egypt_maisd2.jpg"
 description: "The third episode of the National Dishes Series — Egypt's iconic koshari, a Cairo street food staple of rice, lentils, pasta and chickpeas, drowned in tomato sauce and topped with crispy fried onions, spicy shatta and garlicky da'ah."
 relatedRecipes:

@@ -49,39 +49,6 @@ episode: 22
 
 Abraham Lincoln's chicken fricassee with cream gravy and flaky buttermilk biscuits. The recipe comes from Eliza Leslie's _Directions for Cookery_ (1837) — the bestselling American cookbook of the nineteenth century, and the book Mary Todd Lincoln kept in her White House kitchen.
 
-## Ingredients
-
-### Buttermilk Biscuits
-
-- 250g (2 cups) plain flour
-- 1 tbsp baking powder
-- ½ tsp baking soda
-- 1 tsp salt
-- 85g cold butter
-- 180ml (¾ cup) buttermilk
-
-### Spice Mix
-
-- ¼ tsp ground mace
-- ½ tsp dried marjoram
-- ¼ tsp freshly grated nutmeg
-- 1 tsp salt
-- 1 tsp black pepper
-
-### Chicken Fricassee
-
-- 1 whole chicken, butchered into pieces
-- Plain flour, for dredging
-- 2 tbsp butter, for browning
-- 2 tbsp plain flour, for the gravy
-- 240ml (1 cup) heavy cream
-- 240ml (1 cup) whole milk
-
-### Garnish
-
-- Small bunch of fresh parsley
-- 1 tbsp lard
-
 ## Instructions
 
 ### Make the Buttermilk Biscuits

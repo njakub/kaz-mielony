@@ -59,60 +59,6 @@ episode: 23
 
 Egypt's iconic street food — rice, black lentils, vermicelli and elbow macaroni piled together and drowned in spiced tomato sauce, with crispy fried onions, garlicky da'ah vinegar sauce and spicy shatta chilli sauce. It has Indian, Italian and Egyptian influences crammed into one bowl, and it absolutely works.
 
-## Ingredients
-
-### Crispy Fried Onions
-
-- 3 large onions, thinly sliced
-- 2 tbsp cornstarch
-- 2 cups vegetable oil (for frying)
-- Salt
-
-### Tomato Base Sauce
-
-- 2 tbsp reserved onion oil
-- 2 cloves garlic, crushed
-- 1 tbsp tomato paste
-- 1 cup (240ml) passata
-- 2 tbsp white wine vinegar
-- 1 tsp sugar
-- 1 tsp ground cumin
-- 1 tsp ground coriander
-- Salt and pepper to taste
-
-### Shatta (Chilli Sauce)
-
-- 1 tbsp reserved onion oil
-- 1 tsp chilli flakes
-- 1 tbsp chilli powder
-- 3 cloves garlic, crushed
-- 2 tbsp tomato purée
-- ¼ cup (60ml) tomato base sauce (from above)
-- ¼ tsp ground cumin
-- Water, to loosen if needed
-
-### Da'ah (Garlic Vinegar Sauce)
-
-- 2 tbsp reserved onion oil
-- 6 cloves garlic, crushed
-- ½ cup (120ml) distilled vinegar
-- ½ cup (120ml) water
-- 1 tbsp ground cumin
-- 1 tbsp lime juice
-
-### Koshari Base
-
-- ½ cup black lentils, soaked in hot water for 1 hour
-- ½ cup short-grain rice (or basmati), rinsed
-- ½ cup vermicelli pasta
-- ½ cup elbow macaroni
-- 1 can chickpeas, drained and rinsed
-- ½ cup reserved onion oil
-- 2 tsp ground cumin
-- 2 tsp ground coriander
-- 2 cups water
-- Salt
-
 ## Instructions
 
 ### Crispy Fried Onions
