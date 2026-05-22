@@ -3,7 +3,7 @@ title: "Guatemalan Pepián de Pollo"
 historicalFigure: "Guatemala"
 episodeNumber: 25
 publishDate: 2026-05-09
-youtubeId: "tbd"
+youtubeId: "Rce-blISI54"
 thumbnail: "https://res.cloudinary.com/dfxheaozx/image/upload/v1778317454/kaz-mielony/guatemala_sg2mvu.jpg"
 description: "The fifth episode of the National Dishes Series — Guatemala's pepián de pollo, one of the oldest dishes in the Americas. A rich sauce of toasted pumpkin seeds, sesame, charred tomatoes and dried chillies, served over poached chicken with green beans and potatoes."
 relatedRecipes:
