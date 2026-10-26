@@ -37,7 +37,11 @@ const seriesStats = SERIES_KEYS.map((key) => {
 });
 const nationsCount = seriesStats.find((s) => s.key === 'nations')?.episodes.length ?? 0;
 
-const marqueeNames = [...new Set([...episodes].sort((a, b) => a.data.episodeNumber - b.data.episodeNumber).map((e) => e.data.historicalFigure))];
+// One entry per figure/country, linking to their (first) episode
+const marqueeItems = [...episodes]
+  .sort((a, b) => a.data.episodeNumber - b.data.episodeNumber)
+  .filter((e, i, all) => all.findIndex((x) => x.data.historicalFigure === e.data.historicalFigure) === i)
+  .map((e) => ({ name: e.data.historicalFigure, href: `/episodes/${e.slug}` }));
 
 const rouletteItems = recipes.map((r) => ({
   href: `/recipes/${r.slug}`,
@@ -117,20 +121,20 @@ const heroStats = [
   </section>
 
   <!-- ─── Marquee ───────────────────────────────────────── -->
-  <div class="relative border-y border-smoke bg-ink py-5 overflow-hidden select-none" aria-hidden="true">
-    <div class="flex w-max animate-marquee hover:[animation-play-state:paused]">
-      {[0, 1].map(() => (
-        <ul class="flex shrink-0 items-center">
-          {marqueeNames.map((name) => (
+  <nav class="relative border-y border-smoke bg-ink py-5 overflow-hidden select-none" aria-label="Everyone Kaz has cooked">
+    <div class="flex w-max animate-marquee hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]">
+      {[0, 1].map((copy) => (
+        <ul class="flex shrink-0 items-center" aria-hidden={copy === 1 ? 'true' : undefined}>
+          {marqueeItems.map((item) => (
             <li class="flex items-center font-display uppercase text-3xl sm:text-4xl whitespace-nowrap">
-              <span class="marquee-word px-6">{name}</span>
-              <span class="w-2.5 h-2.5 rounded-full bg-gold"></span>
+              <a href={item.href} class="marquee-word px-6" tabindex={copy === 1 ? -1 : undefined}>{item.name}</a>
+              <span class="w-2.5 h-2.5 rounded-full bg-gold" aria-hidden="true"></span>
             </li>
           ))}
         </ul>
       ))}
     </div>
-  </div>
+  </nav>
 
   <!-- ─── Latest episode ────────────────────────────────── -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
@@ -363,7 +367,8 @@ const heroStats = [
 
 <style>
   .marquee-word { color: transparent; -webkit-text-stroke: 1px rgba(251, 247, 239, 0.55); transition: color 0.2s; }
-  .marquee-word:hover { color: #e5c074; -webkit-text-stroke-color: #e5c074; }
+  .marquee-word:hover,
+  .marquee-word:focus-visible { color: #e5c074; -webkit-text-stroke-color: #e5c074; }
   .roulette-filter[aria-checked="true"] { background: #282828; color: #fbf7ef; --tw-ring-color: #282828; }
   .roulette-filter[aria-checked="false"]:hover { background: rgba(40, 40, 40, 0.06); }
   .stamp { transform: rotate(var(--r, 0deg)); }
