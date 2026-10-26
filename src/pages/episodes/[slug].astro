@@ -2,6 +2,8 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../components/Layout.astro';
 import VideoEmbed from '../../components/VideoEmbed.astro';
+import RecipeCard from '../../components/RecipeCard.astro';
+import { SERIES, getEpisodeSeries, getEpisodeThumbnail, hasVideo, formatDate } from '../../utils/series';
 
 export async function getStaticPaths() {
   const episodes = await getCollection('episodes');
@@ -18,73 +20,98 @@ type Props = {
 const { episode } = Astro.props as Props;
 const { Content } = await episode.render();
 
+const series = getEpisodeSeries(episode);
+const thumbnail = getEpisodeThumbnail(episode);
+
 // Get related recipes
 const recipes = await getCollection('recipes');
-const relatedRecipes = recipes.filter(recipe => 
+const relatedRecipes = recipes.filter(recipe =>
   episode.data.relatedRecipes.includes(recipe.slug)
 );
+
+// Previous / next by episode number
+const episodes = (await getCollection('episodes')).sort((a, b) => a.data.episodeNumber - b.data.episodeNumber);
+const index = episodes.findIndex((e) => e.slug === episode.slug);
+const prev = episodes[index - 1];
+const next = episodes[index + 1];
 ---
 
-<Layout title={episode.data.title} description={episode.data.description}>
-  <article class="max-w-5xl mx-auto px-4 py-8">
-    <header class="mb-8">
-      <div class="mb-4">
-        <a href="/episodes" class="text-primary hover:text-accent font-medium">
-          ← Back to Episodes
-        </a>
+<Layout title={episode.data.title} description={episode.data.description} image={thumbnail}>
+  <article>
+    <header class="relative overflow-hidden">
+      <span class="absolute -right-6 top-0 font-display text-[16rem] sm:text-[24rem] leading-[0.8] text-white/[0.03] select-none pointer-events-none" aria-hidden="true">
+        {String(episode.data.episodeNumber).padStart(2, '0')}
+      </span>
+      <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <nav class="text-sm text-cream/50 flex flex-wrap items-center gap-2" aria-label="Breadcrumb">
+          <a href="/episodes" class="hover:text-gold">Episodes</a>
+          <span aria-hidden="true">/</span>
+          <a href={`/episodes?series=${series}`} class="hover:text-gold">{SERIES[series].short}</a>
+        </nav>
+
+        <div class="mt-8 flex flex-wrap items-center gap-2">
+          <span class:list={[
+            "text-[0.68rem] font-semibold uppercase tracking-[0.14em] px-3 py-1 rounded-full",
+            series === 'nations' ? "bg-cream text-charcoal" : "bg-gold text-charcoal",
+          ]}>{SERIES[series].name}</span>
+          <span class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] px-3 py-1 rounded-full ring-1 ring-smoke">Episode {episode.data.episodeNumber}</span>
+          <time class="text-sm text-cream/50 ml-1" datetime={episode.data.publishDate.toISOString()}>{formatDate(episode.data.publishDate)}</time>
+        </div>
+
+        <p class="mt-7 font-serif italic text-2xl sm:text-3xl text-gold">{episode.data.historicalFigure}</p>
+        <h1 class="mt-1 font-display uppercase text-[clamp(3rem,8vw,6.5rem)] leading-[0.9] tracking-tight">{episode.data.title}</h1>
+        <p class="mt-6 text-lg sm:text-xl text-cream/70 leading-relaxed max-w-3xl">{episode.data.description}</p>
       </div>
-      
-      <div class="flex items-center gap-4 mb-4">
-        <span class="bg-primary text-text-dark px-3 py-1 rounded-full text-sm font-medium">
-          Episode {episode.data.episodeNumber}
-        </span>
-        <time class="text-muted">
-          {episode.data.publishDate.toLocaleDateString()}
-        </time>
-      </div>
-      
-      <h1 class="text-4xl md:text-5xl font-bold text-text-light mb-4">
-        {episode.data.title}
-      </h1>
-      
-      <p class="text-xl text-text-light/80 mb-8">
-        {episode.data.description}
-      </p>
-      
-      <div class="mb-8">
-        <VideoEmbed videoId={episode.data.youtubeId} title={episode.data.title} />
+
+      <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+        <VideoEmbed videoId={episode.data.youtubeId} title={episode.data.title} thumbnail={thumbnail} />
+        {hasVideo(episode) && (
+          <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            <a href={`https://www.youtube.com/watch?v=${episode.data.youtubeId}`} target="_blank" rel="noopener" class="text-cream/60 hover:text-gold">Watch on YouTube ↗</a>
+            <a href={SERIES[series].playlist} target="_blank" rel="noopener" class="text-cream/60 hover:text-gold">{SERIES[series].name} playlist ↗</a>
+          </div>
+        )}
       </div>
     </header>
 
-    <div class="prose prose-lg max-w-none mb-12 prose-invert prose-headings:text-text-light prose-p:text-text-light prose-strong:text-text-light prose-li:text-text-light prose-h2:text-primary prose-h3:text-accent">
-      <Content />
-    </div>
-
-    <!-- Related Recipes -->
     {relatedRecipes.length > 0 && (
-      <section class="border-t border-border pt-8">
-        <h2 class="text-2xl font-bold text-text-light mb-6">
-          Recipes from this Episode
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {relatedRecipes.map((recipe) => (
-            <div class="bg-surface border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
-              <h3 class="font-bold text-lg mb-2">
-                <a href={`/recipes/${recipe.slug}`} class="text-text-light hover:text-primary">
-                  {recipe.data.title}
-                </a>
-              </h3>
-              <p class="text-text-light/70 text-sm mb-4">{recipe.data.description}</p>
-              <div class="flex justify-between items-center text-sm text-muted">
-                <span class="bg-primary text-text-dark px-2 py-1 rounded capitalize">
-                  {recipe.data.mealType}
-                </span>
-                <span>{recipe.data.cookTime} min</span>
-              </div>
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div class="rounded-3xl bg-gold text-charcoal p-6 sm:p-10">
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-label text-charcoal/60">Cook along</p>
+              <h2 class="mt-2 font-display uppercase text-4xl sm:text-5xl leading-none">On the menu</h2>
             </div>
-          ))}
+            <p class="text-sm text-charcoal/70 max-w-xs">Full ingredient lists, timings and Kaz's notes for everything in this episode.</p>
+          </div>
+          <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {relatedRecipes.map((recipe) => (
+              <RecipeCard recipe={recipe} series={series} />
+            ))}
+          </div>
         </div>
       </section>
     )}
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+      <div class="km-prose">
+        <Content />
+      </div>
+    </div>
+
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 grid sm:grid-cols-2 gap-4" aria-label="More episodes">
+      {prev ? (
+        <a href={`/episodes/${prev.slug}`} class="group rounded-2xl ring-1 ring-smoke hover:ring-gold p-6 transition-colors">
+          <p class="text-xs uppercase tracking-label text-cream/50">← Episode {prev.data.episodeNumber}</p>
+          <p class="mt-2 font-display uppercase text-2xl sm:text-3xl leading-none group-hover:text-gold transition-colors">{prev.data.historicalFigure}</p>
+        </a>
+      ) : <span></span>}
+      {next && (
+        <a href={`/episodes/${next.slug}`} class="group rounded-2xl ring-1 ring-smoke hover:ring-gold p-6 text-right transition-colors">
+          <p class="text-xs uppercase tracking-label text-cream/50">Episode {next.data.episodeNumber} →</p>
+          <p class="mt-2 font-display uppercase text-2xl sm:text-3xl leading-none group-hover:text-gold transition-colors">{next.data.historicalFigure}</p>
+        </a>
+      )}
+    </nav>
   </article>
 </Layout>

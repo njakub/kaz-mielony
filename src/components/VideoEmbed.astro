@@ -1,19 +1,47 @@
 ---
+// Click-to-load YouTube player: shows the thumbnail until the viewer presses play,
+// so pages don't pay for a full YouTube iframe up front.
 export interface Props {
   videoId: string;
   title?: string;
+  thumbnail?: string;
 }
 
-const { videoId, title } = Astro.props;
+const { videoId, title = "YouTube video", thumbnail } = Astro.props;
+const isValid = /^[A-Za-z0-9_-]{11}$/.test(videoId);
+const poster = thumbnail ?? (isValid ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : undefined);
 ---
 
-<div class="relative w-full" style="padding-bottom: 56.25%;">
-  <iframe
-    class="absolute top-0 left-0 w-full h-full rounded-lg"
-    src={`https://www.youtube.com/embed/${videoId}`}
-    title={title || "YouTube video"}
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen>
-  </iframe>
+<div class="video-embed relative w-full aspect-video rounded-2xl overflow-hidden bg-charcoal ring-1 ring-smoke shadow-2xl shadow-black/50" data-video-id={isValid ? videoId : undefined} data-title={title}>
+  {poster && <img src={poster} alt="" class="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />}
+  {isValid ? (
+    <button type="button" class="video-play group absolute inset-0 grid place-items-center bg-ink/30 hover:bg-ink/10 transition-colors" aria-label={`Play: ${title}`}>
+      <span class="relative grid place-items-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gold text-charcoal shadow-xl transition-transform duration-300 group-hover:scale-110">
+        <span class="absolute inset-0 rounded-full bg-gold/60 animate-ping opacity-40"></span>
+        <svg class="relative w-8 h-8 ml-1" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+      </span>
+    </button>
+  ) : (
+    <div class="absolute inset-0 grid place-items-center bg-ink/70 backdrop-blur-sm text-center px-6">
+      <div>
+        <p class="eyebrow justify-center">In the edit</p>
+        <p class="mt-3 font-display uppercase text-4xl sm:text-5xl text-cream">Episode coming soon</p>
+        <a href="https://www.youtube.com/@KazMielony?sub_confirmation=1" target="_blank" rel="noopener" class="inline-block mt-5 text-sm font-semibold text-gold hover:text-gold-light underline underline-offset-4">Subscribe so you don't miss it</a>
+      </div>
+    </div>
+  )}
 </div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.video-embed[data-video-id]').forEach((wrap) => {
+    wrap.querySelector('.video-play')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${wrap.dataset.videoId}?autoplay=1&rel=0`;
+      iframe.title = wrap.dataset.title ?? 'YouTube video';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.className = 'absolute inset-0 w-full h-full';
+      wrap.replaceChildren(iframe);
+    });
+  });
+</script>

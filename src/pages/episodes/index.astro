@@ -1,6 +1,10 @@
 ---
 import Layout from '../../components/Layout.astro';
+import EpisodeCard from '../../components/EpisodeCard.astro';
+import SoundBites from '../../components/SoundBites.astro';
+import { getShorts } from '../../utils/youtube';
 import { getCollection } from 'astro:content';
+import { SERIES, SERIES_KEYS, getEpisodeSeries } from '../../utils/series';
 
 const episodes = await getCollection('episodes');
 const sortedEpisodes = episodes.sort((a, b) => {
@@ -8,64 +12,91 @@ const sortedEpisodes = episodes.sort((a, b) => {
   if (dateDiff !== 0) return dateDiff;
   return (b.data.episodeNumber ?? 0) - (a.data.episodeNumber ?? 0);
 });
+
+const shorts = await getShorts();
+
+const tabs = [
+  { key: 'all', label: 'All episodes', count: episodes.length, tagline: 'Every episode, newest first.', playlist: 'https://www.youtube.com/@KazMielony/videos' },
+  ...SERIES_KEYS.map((k) => ({
+    key: k,
+    label: SERIES[k].name,
+    count: episodes.filter((e) => getEpisodeSeries(e) === k).length,
+    tagline: SERIES[k].tagline,
+    playlist: SERIES[k].playlist,
+  })),
+];
 ---
 
-<Layout title="All Episodes">
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <header class="mb-8">
-      <h1 class="text-4xl font-bold text-text-light mb-4">All Episodes</h1>
-      <p class="text-lg text-text-light/80">
-        Watch the full collection of historical cooking adventures
-      </p>
-    </header>
+<Layout title="All Episodes" description="Every episode of Kaz Cooks History and Kaz Cooks Nations, with the recipes from each one.">
+  <header class="relative overflow-hidden border-b border-smoke">
+    <div class="absolute -top-40 -left-40 w-[34rem] h-[34rem] rounded-full bg-gold/10 blur-3xl pointer-events-none" aria-hidden="true"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
+      <p class="eyebrow">Now showing</p>
+      <h1 class="mt-4 font-display uppercase text-6xl sm:text-8xl leading-[0.88]">
+        The episodes<span class="text-gold">.</span>
+      </h1>
+      <p id="series-tagline" class="mt-5 text-lg text-cream/65 max-w-2xl">{tabs[0].tagline}</p>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {sortedEpisodes.map((episode) => (
-        <article class="bg-surface border border-border rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-          <div class="aspect-video bg-background/20">
-            <iframe
-              class="w-full h-full"
-              src={`https://www.youtube.com/embed/${episode.data.youtubeId}`}
-              title={episode.data.title}
-              frameborder="0"
-              allowfullscreen>
-            </iframe>
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-primary font-medium">
-                Episode {episode.data.episodeNumber}
-              </span>
-              <time class="text-sm text-muted">
-                {episode.data.publishDate.toLocaleDateString()}
-              </time>
-            </div>
-            <h3 class="text-xl font-bold mb-3">
-              <a href={`/episodes/${episode.slug}`} class="text-text-light hover:text-primary transition-colors">
-                {episode.data.title}
-              </a>
-            </h3>
-            <p class="text-text-light/80 mb-3 font-medium">
-              {episode.data.historicalFigure}
-            </p>
-            <p class="text-text-light/70 text-sm mb-4 line-clamp-3">
-              {episode.data.description}
-            </p>
-            <a 
-              href={`/episodes/${episode.slug}`}
-              class="inline-block bg-primary text-text-dark px-4 py-2 rounded font-medium hover:bg-accent transition-colors"
-            >
-              Watch Episode
-            </a>
-          </div>
-        </article>
-      ))}
+      <div class="mt-10 flex flex-wrap items-center gap-2" role="tablist" aria-label="Series">
+        {tabs.map((tab, i) => (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-tab={tab.key}
+            data-tagline={tab.tagline}
+            data-playlist={tab.playlist}
+            class="series-tab inline-flex items-center gap-2 font-semibold text-sm px-5 py-3 rounded-full ring-1 ring-smoke text-cream/70 hover:text-cream transition-colors"
+          >
+            {tab.label}
+            <span class="count text-[0.7rem] px-2 py-0.5 rounded-full bg-white/10">{tab.count}</span>
+          </button>
+        ))}
+        <a id="playlist-link" href={tabs[0].playlist} target="_blank" rel="noopener" class="sm:ml-auto text-sm font-semibold text-gold hover:text-gold-light">Open on YouTube ↗</a>
+      </div>
     </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+    <div id="episode-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+      {sortedEpisodes.map((episode) => <EpisodeCard episode={episode} />)}
+    </div>
+
+    {shorts.length > 0 && (
+      <div class="pt-28">
+        <SoundBites shorts={shorts} />
+      </div>
+    )}
 
     {episodes.length === 0 && (
       <div class="text-center py-16">
-        <p class="text-muted text-lg">No episodes found. Check back soon for new content!</p>
+        <p class="text-cream/50 text-lg">No episodes found. Check back soon for new content!</p>
       </div>
     )}
   </div>
 </Layout>
+
+<style>
+  .series-tab[aria-selected="true"] { background: #e5c074; color: #282828; --tw-ring-color: #e5c074; }
+  .series-tab[aria-selected="true"] .count { background: rgba(40, 40, 40, 0.15); }
+</style>
+
+<script>
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-tab]')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.episode-card')];
+  const tagline = document.getElementById('series-tagline')!;
+  const playlist = document.getElementById('playlist-link') as HTMLAnchorElement;
+
+  function select(key: string, push = true) {
+    const tab = tabs.find((t) => t.dataset.tab === key) ?? tabs[0];
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+    cards.forEach((c) => (c.hidden = tab.dataset.tab !== 'all' && c.dataset.series !== tab.dataset.tab));
+    tagline.textContent = tab.dataset.tagline!;
+    playlist.href = tab.dataset.playlist!;
+    if (push) history.replaceState(null, '', tab.dataset.tab === 'all' ? location.pathname : `?series=${tab.dataset.tab}`);
+  }
+
+  tabs.forEach((t) => t.addEventListener('click', () => select(t.dataset.tab!)));
+  const initial = new URLSearchParams(location.search).get('series');
+  if (initial) select(initial, false);
+</script>

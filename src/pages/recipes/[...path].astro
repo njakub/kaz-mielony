@@ -2,7 +2,16 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../components/Layout.astro';
 import VideoEmbed from '../../components/VideoEmbed.astro';
+import RecipeCard from '../../components/RecipeCard.astro';
 import { getCloudinaryUrl } from '../../utils/cloudinary';
+import {
+  SERIES,
+  getRecipeSeries,
+  findRecipeEpisode,
+  getEpisodeThumbnail,
+  hasVideo,
+  formatMinutes,
+} from '../../utils/series';
 
 export async function getStaticPaths() {
   const recipes = await getCollection('recipes');
@@ -18,162 +27,397 @@ type Props = {
 
 const { recipe } = Astro.props as Props;
 const { Content } = await recipe.render();
+const { data } = recipe;
+
+const recipes = await getCollection('recipes');
+const episodes = await getCollection('episodes');
+const series = getRecipeSeries(recipe, episodes);
+const episode = findRecipeEpisode(recipe, episodes);
+
+const moreRecipes = recipes
+  .filter((r) => r.slug !== recipe.slug && getRecipeSeries(r, episodes) === series)
+  .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime())
+  .slice(0, 3);
+
+const difficultyLevel = { easy: 1, medium: 2, hard: 3 }[data.difficulty];
+const ingredientCount = data.ingredients.filter((i) => !i.startsWith('##')).length;
+const heroImage = data.image ? getCloudinaryUrl(data.image, { width: 1200, height: 900, crop: 'fill', gravity: 'auto' }) : undefined;
+
+const stats = [
+  { label: 'Prep', value: formatMinutes(data.prepTime) },
+  { label: 'Cook', value: formatMinutes(data.cookTime) },
+  { label: 'Total', value: formatMinutes(data.prepTime + data.cookTime) },
+  { label: 'Serves', value: String(data.servings) },
+];
 ---
 
-<Layout title={recipe.data.title} description={recipe.data.description}>
-  <article class="max-w-5xl mx-auto px-4 py-8">
-    <header class="mb-8">
-      <div class="mb-4">
-        <a href="/recipes" class="text-primary hover:text-accent font-medium">
-          ← Back to Recipes
-        </a>
-      </div>
-      
-      <div class="flex flex-wrap items-center gap-2 text-sm text-muted mb-4">
-        <span class="bg-accent/20 text-accent px-2 py-1 rounded">
-          {recipe.data.historicalFigure}
-        </span>
-        <span class="bg-primary/20 text-primary px-2 py-1 rounded">
-          {recipe.data.timePeriod}
-        </span>
-        <span class="bg-secondary/50 text-text-dark px-2 py-1 rounded capitalize">
-          {recipe.data.mealType}
-        </span>
-        <span class="bg-surface/50 text-text-light px-2 py-1 rounded capitalize">
-          {recipe.data.difficulty}
-        </span>
-      </div>
+<Layout title={data.title} description={data.description} image={heroImage}>
+  <article>
+    <!-- ─── Hero ─────────────────────────────────────── -->
+    <header class="relative overflow-hidden">
+      <div class="absolute inset-y-0 right-0 hidden lg:block w-[38%] bg-gold" aria-hidden="true"></div>
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-14 lg:pb-20">
+        <nav class="text-sm text-cream/50 flex flex-wrap items-center gap-2 no-print" aria-label="Breadcrumb">
+          <a href="/recipes" class="hover:text-gold">Recipes</a>
+          <span aria-hidden="true">/</span>
+          <a href={`/recipes?series=${series}`} class="hover:text-gold">{SERIES[series].short}</a>
+          <span aria-hidden="true">/</span>
+          <span class="text-cream/80">{data.historicalFigure}</span>
+        </nav>
 
-      <h1 class="text-4xl font-bold text-text-light mb-4">{recipe.data.title}</h1>
-      <p class="text-xl text-text-light/80 mb-6">{recipe.data.description}</p>
+        <div class="mt-8 grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 items-center">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class:list={[
+                "text-[0.68rem] font-semibold uppercase tracking-[0.14em] px-3 py-1 rounded-full",
+                series === 'nations' ? "bg-cream text-charcoal" : "bg-gold text-charcoal",
+              ]}>{SERIES[series].name}</span>
+              {episode && (
+                <a href={`/episodes/${episode.slug}`} class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] px-3 py-1 rounded-full ring-1 ring-smoke hover:ring-gold hover:text-gold transition-colors">
+                  Episode {episode.data.episodeNumber}
+                </a>
+              )}
+              <span class="text-[0.68rem] font-semibold uppercase tracking-[0.14em] px-3 py-1 rounded-full ring-1 ring-smoke text-cream/60">{data.timePeriod}</span>
+            </div>
 
-      {recipe.data.image && (
-        <div class={`relative ${recipe.slug === 'marilyn-monroe/marilyn-warm-milk-egg-drink' ? 'w-96 aspect-square mx-auto' : 'w-full h-96'} mb-8 rounded-lg overflow-hidden`}>
-          <img 
-            src={getCloudinaryUrl(recipe.data.image, { 
-              width: recipe.slug === 'marilyn-monroe/marilyn-warm-milk-egg-drink' ? 800 : 1200, 
-              height: recipe.slug === 'marilyn-monroe/marilyn-warm-milk-egg-drink' ? 800 : 600, 
-              crop: 'fill', 
-              gravity: 'center' 
-            })}
-            alt={recipe.data.title}
-            class="w-full h-full object-cover"
-            loading="eager"
-          />
-        </div>
-      )}
+            <p class="mt-7 font-serif italic text-2xl sm:text-3xl text-gold">{data.historicalFigure}</p>
+            <h1 class="mt-1 font-display uppercase text-[clamp(3rem,7vw,5.75rem)] leading-[0.9] tracking-tight">{data.title}</h1>
+            <p class="mt-6 text-lg text-cream/70 leading-relaxed max-w-xl">{data.description}</p>
 
-      <div class="flex flex-wrap gap-6 text-sm text-text-light/80 mb-8">
-        <div class="flex items-center">
-          <span class="font-semibold mr-2">Prep:</span>
-          {recipe.data.prepTime} min
-        </div>
-        <div class="flex items-center">
-          <span class="font-semibold mr-2">Cook:</span>
-          {recipe.data.cookTime} min
-        </div>
-        <div class="flex items-center">
-          <span class="font-semibold mr-2">Serves:</span>
-          {recipe.data.servings}
-        </div>
-      </div>
+            <dl class="mt-9 grid grid-cols-2 sm:grid-cols-5 gap-px rounded-2xl overflow-hidden bg-smoke ring-1 ring-smoke max-w-2xl">
+              {stats.map((s) => (
+                <div class="bg-charcoal px-4 py-3.5">
+                  <dt class="text-[0.65rem] uppercase tracking-label text-cream/45">{s.label}</dt>
+                  <dd class="mt-1 font-semibold text-cream">{s.value}</dd>
+                </div>
+              ))}
+              <div class="bg-charcoal px-4 py-3.5 col-span-2 sm:col-span-1">
+                <dt class="text-[0.65rem] uppercase tracking-label text-cream/45">Difficulty</dt>
+                <dd class="mt-1.5 flex items-center gap-2 font-semibold capitalize">
+                  <span class="flex gap-0.5" aria-hidden="true">
+                    {[1, 2, 3].map((n) => <span class:list={["w-1.5 h-3.5 rounded-sm", n <= difficultyLevel ? "bg-gold" : "bg-smoke"]}></span>)}
+                  </span>
+                  {data.difficulty}
+                </dd>
+              </div>
+            </dl>
+          </div>
 
-      <div class="flex flex-wrap gap-2 mb-8">
-        {recipe.data.tags.map((tag) => (
-          <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-            #{tag}
-          </span>
-        ))}
+          {heroImage && (
+            <div class="relative">
+              <div class="rounded-[1.75rem] bg-cream p-2.5 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)] rotate-[1.5deg] hover:rotate-0 transition-transform duration-500">
+                <img src={heroImage} alt={data.title} class="rounded-[1.25rem] w-full aspect-[4/3] object-cover" width="1200" height="900" loading="eager" />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <aside class="lg:col-span-1">
-        <div class="bg-secondary p-6 rounded-lg sticky top-8 max-h-[calc(100vh-4rem)] flex flex-col">
-          <h2 class="text-xl font-bold text-text-dark mb-4 flex-shrink-0">Ingredients</h2>
-          <div class="space-y-4 overflow-y-auto pr-2 -mr-2">
-            {recipe.data.ingredients.map((ingredient) => {
-              // Check if this is a section header (starts with ##)
-              if (ingredient.startsWith('##')) {
-                return (
-                  <h3 class="text-base font-bold text-text-dark mt-6 mb-2 first:mt-0">
-                    {ingredient.replace('##', '').trim()}
-                  </h3>
-                );
-              }
-              // Regular ingredient
-              return (
-                <div class="text-text-dark text-sm flex items-start">
-                  <span class="text-primary mr-2">•</span>
-                  <span>{ingredient}</span>
-                </div>
-              );
-            })}
+    <!-- ─── Toolbar ──────────────────────────────────── -->
+    <div class="sticky top-16 z-30 bg-ink/85 backdrop-blur-xl border-y border-smoke no-print">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <button type="button" id="cook-mode" aria-pressed="false" class="tool-btn">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3c2 3 5 4.5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5 1-7.5Z"/></svg>
+          <span>Cook mode</span>
+        </button>
+        <a href="#method" class="tool-btn">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Jump to method
+        </a>
+        {episode && hasVideo(episode) && (
+          <a href="#watch" class="tool-btn">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+            Watch Kaz make it
+          </a>
+        )}
+        <button type="button" id="copy-list" class="tool-btn">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+          <span>Copy shopping list</span>
+        </button>
+        <button type="button" id="print-recipe" class="tool-btn">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z"/></svg>
+          Print
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Body ─────────────────────────────────────── -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 grid lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)] gap-10 lg:gap-16">
+      <aside>
+        <div class="lg:sticky lg:top-36 rounded-3xl bg-cream text-charcoal p-6 sm:p-7 lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto">
+          <div class="flex items-baseline justify-between gap-4">
+            <h2 class="font-display uppercase text-4xl leading-none">Ingredients</h2>
+            <p class="text-xs font-semibold text-charcoal/50 tabular-nums"><span id="ing-done">0</span>/{ingredientCount}</p>
           </div>
+          <div class="mt-3 h-1.5 rounded-full bg-charcoal/10 overflow-hidden">
+            <div id="ing-bar" class="h-full w-0 bg-gold-deep rounded-full transition-[width] duration-300"></div>
+          </div>
+          <p class="mt-3 text-xs text-charcoal/50 no-print">Tap to tick things off as you gather them.</p>
+
+          <ul class="mt-4" id="ingredients">
+            {data.ingredients.map((ingredient, i) =>
+              ingredient.startsWith('##') ? (
+                <li class="mt-6 first:mt-2 mb-1 text-[0.7rem] font-bold uppercase tracking-label text-gold-deep">
+                  {ingredient.replace(/^#+/, '').trim()}
+                </li>
+              ) : (
+                <li>
+                  <label class="ingredient group flex items-start gap-3 py-2 border-b border-charcoal/10 cursor-pointer">
+                    <input type="checkbox" class="peer sr-only" data-index={i} data-text={ingredient} />
+                    <span class="mt-0.5 shrink-0 grid place-items-center w-5 h-5 rounded-md ring-2 ring-charcoal/25 peer-checked:bg-charcoal peer-checked:ring-charcoal peer-focus-visible:ring-gold-deep transition-colors">
+                      <svg class="w-3 h-3 text-gold opacity-0 check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>
+                    </span>
+                    <span class="text-[0.95rem] leading-snug peer-checked:line-through peer-checked:text-charcoal/40 transition-colors">{ingredient}</span>
+                  </label>
+                </li>
+              )
+            )}
+          </ul>
+
+          {data.equipment && data.equipment.length > 0 && (
+            <div class="mt-8 pt-6 border-t-2 border-dashed border-charcoal/15">
+              <h3 class="text-[0.7rem] font-bold uppercase tracking-label text-gold-deep">Kit you'll need</h3>
+              <ul class="mt-3 flex flex-wrap gap-1.5">
+                {data.equipment.map((item) => (
+                  <li class="text-xs bg-charcoal/[0.06] rounded-full px-3 py-1.5">{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </aside>
 
-      <main class="lg:col-span-2">
-        <div class="prose prose-lg prose-invert max-w-none">
+      <div id="method" class="scroll-mt-36 min-w-0">
+        <div class="flex items-center justify-between gap-4 mb-8 no-print">
+          <p class="text-xs uppercase tracking-label text-cream/50">Tap a step to mark it done · Tap a <span class="text-gold">time</span> to start a timer</p>
+          <p class="text-xs text-cream/50 tabular-nums shrink-0"><span id="steps-done" class="text-gold font-semibold">0</span>/<span id="steps-total">0</span> steps</p>
+        </div>
+        <div class="km-prose" id="recipe-body">
           <Content />
         </div>
-      </main>
+
+        {episode && hasVideo(episode) && (
+          <section id="watch" class="mt-16 scroll-mt-36 no-print">
+            <p class="eyebrow">Watch Kaz make it</p>
+            <h2 class="mt-3 mb-6 font-display uppercase text-4xl">{episode.data.title}</h2>
+            <VideoEmbed videoId={episode.data.youtubeId} title={episode.data.title} thumbnail={getEpisodeThumbnail(episode)} />
+          </section>
+        )}
+
+        {data.tags.length > 0 && (
+          <div class="mt-14 pt-8 border-t border-smoke flex flex-wrap gap-2 no-print">
+            {data.tags.map((tag) => (
+              <a href={`/recipes?q=${encodeURIComponent(tag.replace(/-/g, ' '))}`} class="text-xs text-cream/60 hover:text-gold ring-1 ring-smoke hover:ring-gold rounded-full px-3 py-1.5 transition-colors">#{tag}</a>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
 
-    <footer class="mt-16 pt-8 border-t border-primary/20">
-      <div class="text-center">
-        <p class="text-text-light/60 mb-4">
-          Inspired by {recipe.data.historicalFigure} • {recipe.data.timePeriod}
-        </p>
-        <a 
-          href="/recipes" 
-          class="inline-block bg-primary text-text-dark px-6 py-2 rounded-lg hover:bg-accent transition-colors"
-        >
-          Explore More Recipes
-        </a>
-      </div>
-    </footer>
+    {moreRecipes.length > 0 && (
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 no-print">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+          <div>
+            <p class="eyebrow">Keep cooking</p>
+            <h2 class="mt-3 font-display uppercase text-5xl leading-none">More from {SERIES[series].short}</h2>
+          </div>
+          <a href={`/recipes?series=${series}`} class="font-semibold text-gold hover:text-gold-light">See all →</a>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {moreRecipes.map((r) => (
+            <RecipeCard recipe={r} series={series} episodeNumber={findRecipeEpisode(r, episodes)?.data.episodeNumber} />
+          ))}
+        </div>
+      </section>
+    )}
   </article>
+
+  <!-- Timer dock -->
+  <div id="timer-dock" class="fixed bottom-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 items-stretch sm:items-end no-print" aria-live="polite"></div>
 </Layout>
 
 <style>
-  .prose h1, .prose h2, .prose h3, .prose h4 {
-    @apply text-text-light;
-  }
-  
-  .prose p, .prose li {
-    @apply text-text-light/80;
-  }
-  
-  .prose strong {
-    @apply text-primary font-semibold;
-  }
-  
-  .prose ol > li::marker {
-    @apply text-primary font-bold;
-  }
-  
-  .prose ul > li::marker {
-    @apply text-primary;
-  }
-  
-  .prose ol {
-    @apply list-decimal space-y-2;
-  }
-  
-  .prose ul {
-    @apply list-disc space-y-1;
-  }
-  
-  .prose ol > li {
-    @apply pl-2;
-  }
-  
-  .prose ul > li {
-    @apply pl-2;
-  }
+  .tool-btn { display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; flex-shrink: 0; font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0.9rem; border-radius: 9999px; color: rgba(251, 247, 239, 0.75); box-shadow: inset 0 0 0 1px #45433f; transition: all 0.2s; }
+  .tool-btn:hover { color: #e5c074; box-shadow: inset 0 0 0 1px #e5c074; }
+  .tool-btn[aria-pressed="true"] { background: #e5c074; color: #282828; box-shadow: none; font-weight: 600; }
+  .ingredient input:checked + span .check { opacity: 1; }
 
-  .prose h3 {
-    @apply text-primary text-lg font-semibold mt-8 mb-4;
+  :global(#recipe-body ol > li) { cursor: pointer; border-radius: 0.75rem; transition: opacity 0.25s, background 0.2s; padding-top: 0.6rem; padding-bottom: 0.6rem; padding-right: 0.75rem; margin-left: -0.75rem; padding-left: 4.25rem; }
+  :global(#recipe-body ol > li::before) { left: 0.75rem; top: 0.5rem; transition: color 0.2s; }
+  :global(#recipe-body ol > li:hover) { background: rgba(255, 255, 255, 0.03); }
+  :global(#recipe-body ol > li.is-done) { opacity: 0.4; }
+  :global(#recipe-body ol > li.is-done::before) { content: "✓"; color: #9a958c; }
+
+  :global(.timer-chip) { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 600; color: #e5c074; background: rgba(229, 192, 116, 0.12); box-shadow: inset 0 0 0 1px rgba(229, 192, 116, 0.35); padding: 0 0.5rem; border-radius: 9999px; line-height: 1.6; transition: background 0.2s; }
+  :global(.timer-chip:hover) { background: rgba(229, 192, 116, 0.25); }
+
+  :global(body.cook-mode .km-prose) { font-size: 1.3rem; line-height: 1.8; }
+  :global(body.cook-mode .ingredient span:last-child) { font-size: 1.1rem; }
+
+  @media print {
+    :global(body) { background: #fff !important; }
+    aside > div { position: static !important; max-height: none !important; background: #fff !important; padding: 0 !important; }
+    header .bg-gold { display: none; }
+    h1 { color: #111 !important; }
   }
 </style>
+
+<script>
+  const slug = location.pathname;
+  const store = {
+    get(key: string): number[] {
+      try { return JSON.parse(localStorage.getItem(key) ?? '[]'); } catch { return []; }
+    },
+    set(key: string, value: number[]) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ }
+    },
+  };
+
+  /* ── Ingredient checklist ─────────────────────────── */
+  const ingKey = `kaz-ingredients:${slug}`;
+  const boxes = [...document.querySelectorAll<HTMLInputElement>('#ingredients input[type="checkbox"]')];
+  const ingDone = document.getElementById('ing-done')!;
+  const ingBar = document.getElementById('ing-bar')!;
+  const saved = new Set(store.get(ingKey));
+  boxes.forEach((b) => (b.checked = saved.has(Number(b.dataset.index))));
+  const updateIngredients = () => {
+    const checked = boxes.filter((b) => b.checked);
+    ingDone.textContent = String(checked.length);
+    ingBar.style.width = `${boxes.length ? (checked.length / boxes.length) * 100 : 0}%`;
+    store.set(ingKey, checked.map((b) => Number(b.dataset.index)));
+  };
+  boxes.forEach((b) => b.addEventListener('change', updateIngredients));
+  updateIngredients();
+
+  /* ── Method steps ─────────────────────────────────── */
+  const stepKey = `kaz-steps:${slug}`;
+  const steps = [...document.querySelectorAll<HTMLLIElement>('#recipe-body ol > li')];
+  const stepsDone = document.getElementById('steps-done')!;
+  document.getElementById('steps-total')!.textContent = String(steps.length);
+  const savedSteps = new Set(store.get(stepKey));
+  steps.forEach((li, i) => {
+    li.classList.toggle('is-done', savedSteps.has(i));
+    li.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a, button')) return;
+      li.classList.toggle('is-done');
+      updateSteps();
+    });
+  });
+  function updateSteps() {
+    const done = steps.map((s, i) => (s.classList.contains('is-done') ? i : -1)).filter((i) => i >= 0);
+    stepsDone.textContent = String(done.length);
+    store.set(stepKey, done);
+  }
+  updateSteps();
+
+  /* ── Tappable timers on bold durations ────────────── */
+  const durationRe = /^(?:about\s+|around\s+)?(\d+(?:\.\d+)?)(?:\s*[–-]\s*\d+(?:\.\d+)?)?\s*(hours?|hrs?|minutes?|mins?|seconds?|secs?)$/i;
+  document.querySelectorAll<HTMLElement>('#recipe-body strong').forEach((el) => {
+    const m = el.textContent?.trim().match(durationRe);
+    if (!m) return;
+    const n = parseFloat(m[1]);
+    const unit = m[2].toLowerCase();
+    const seconds = Math.round(unit.startsWith('h') ? n * 3600 : unit.startsWith('m') ? n * 60 : n);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'timer-chip';
+    btn.title = 'Start a timer';
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>`;
+    btn.append(el.textContent!.trim());
+    btn.addEventListener('click', () => startTimer(seconds, el.closest('li')?.textContent?.trim().slice(0, 48) ?? el.textContent!));
+    el.replaceWith(btn);
+  });
+
+  const dock = document.getElementById('timer-dock')!;
+  const fmt = (s: number) => {
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    return (h ? `${h}:${String(m).padStart(2, '0')}` : `${m}`) + `:${String(sec).padStart(2, '0')}`;
+  };
+  function beep() {
+    try {
+      const ctx = new AudioContext();
+      [0, 0.35, 0.7].forEach((t) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.25, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.3);
+        o.connect(g).connect(ctx.destination);
+        o.start(ctx.currentTime + t);
+        o.stop(ctx.currentTime + t + 0.3);
+      });
+    } catch { /* no audio */ }
+  }
+  function startTimer(total: number, label: string) {
+    const end = Date.now() + total * 1000;
+    let paused: number | null = null;
+    let endAt = end;
+    const el = document.createElement('div');
+    el.className = 'flex items-center gap-3 bg-charcoal ring-1 ring-gold/50 shadow-2xl shadow-black/60 rounded-2xl pl-4 pr-2 py-2 sm:min-w-[19rem]';
+    el.innerHTML = `
+      <div class="min-w-0 flex-1">
+        <p class="font-display text-3xl leading-none text-gold tabular-nums" data-time>${fmt(total)}</p>
+        <p class="text-[0.7rem] text-cream/50 truncate mt-1">${label.replace(/</g, '&lt;')}</p>
+      </div>
+      <button type="button" data-pause class="text-xs font-semibold px-3 py-2 rounded-full ring-1 ring-smoke hover:ring-gold">Pause</button>
+      <button type="button" data-close class="grid place-items-center w-8 h-8 rounded-full hover:bg-white/10" aria-label="Dismiss timer">✕</button>`;
+    dock.appendChild(el);
+    const timeEl = el.querySelector<HTMLElement>('[data-time]')!;
+    const pauseBtn = el.querySelector<HTMLButtonElement>('[data-pause]')!;
+    const iv = setInterval(() => {
+      if (paused !== null) return;
+      const left = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+      timeEl.textContent = fmt(left);
+      if (left === 0) {
+        clearInterval(iv);
+        timeEl.textContent = 'Done!';
+        el.classList.add('ring-2', '!ring-tomato', 'animate-bounce');
+        pauseBtn.remove();
+        beep();
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      }
+    }, 250);
+    pauseBtn.addEventListener('click', () => {
+      if (paused === null) { paused = endAt - Date.now(); pauseBtn.textContent = 'Resume'; }
+      else { endAt = Date.now() + paused; paused = null; pauseBtn.textContent = 'Pause'; }
+    });
+    el.querySelector('[data-close]')!.addEventListener('click', () => { clearInterval(iv); el.remove(); });
+  }
+
+  /* ── Cook mode: bigger text + keep the screen awake ── */
+  const cookBtn = document.getElementById('cook-mode')!;
+  let wakeLock: any = null;
+  async function lock() {
+    try { wakeLock = await (navigator as any).wakeLock?.request('screen'); } catch { /* not supported */ }
+  }
+  cookBtn.addEventListener('click', async () => {
+    const on = !document.body.classList.contains('cook-mode');
+    document.body.classList.toggle('cook-mode', on);
+    cookBtn.setAttribute('aria-pressed', String(on));
+    cookBtn.querySelector('span')!.textContent = on ? 'Cook mode on · screen stays awake' : 'Cook mode';
+    if (on) await lock(); else { wakeLock?.release(); wakeLock = null; }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && document.body.classList.contains('cook-mode')) lock();
+  });
+
+  /* ── Copy shopping list / print ───────────────────── */
+  const copyBtn = document.getElementById('copy-list')!;
+  copyBtn.addEventListener('click', async () => {
+    const title = document.querySelector('h1')?.textContent?.trim();
+    const lines = [...document.querySelectorAll<HTMLElement>('#ingredients li')].map((li) => {
+      const box = li.querySelector('input');
+      return box ? `☐ ${box.dataset.text}` : `\n${li.textContent?.trim().toUpperCase()}`;
+    });
+    const text = `${title}\n${lines.join('\n')}\n\n${location.href}`;
+    const label = copyBtn.querySelector('span')!;
+    try {
+      await navigator.clipboard.writeText(text);
+      label.textContent = 'Copied!';
+    } catch {
+      label.textContent = 'Copy failed';
+    }
+    setTimeout(() => (label.textContent = 'Copy shopping list'), 1800);
+  });
+  document.getElementById('print-recipe')!.addEventListener('click', () => window.print());
+</script>

@@ -1,42 +1,90 @@
 ---
 import Layout from '../components/Layout.astro';
+import { getCollection } from 'astro:content';
+import { SERIES, SERIES_KEYS, getEpisodeSeries } from '../utils/series';
+
+const episodes = await getCollection('episodes');
+const recipes = await getCollection('recipes');
+const seriesCounts = Object.fromEntries(SERIES_KEYS.map((k) => [k, episodes.filter((e) => getEpisodeSeries(e) === k).length]));
 ---
 
 <Layout title="About">
-  <div class="max-w-4xl mx-auto px-4 py-16">
-    <header class="text-center mb-12">
-      <h1 class="text-4xl font-bold text-text-light mb-6">About Kaz Mielony</h1>
-      <p class="text-xl text-text-light/80">
-        Exploring history through the meals of iconic and controversial figures
-      </p>
-    </header>
-
-    <div class="prose prose-lg max-w-none prose-invert prose-headings:text-text-light prose-p:text-text-light prose-strong:text-text-light prose-li:text-text-light prose-h2:text-primary prose-h3:text-accent">
-      <div class="bg-surface border border-border p-8 rounded-lg mb-8">
-        <h2 class="text-2xl font-bold mb-4 text-primary">The Concept</h2>
-        <p class="text-text-light/90">
-          History isn't just about dates, battles, and political movements—it's about the people who lived it. 
-          And what better way to understand historical figures than through something as intimate and personal 
-          as their favorite meals?
-        </p>
-        <p class="text-text-light/90">
-          Each episode of Kaz Mielony takes you on a culinary journey through time, recreating dishes that 
-          were beloved by some of history's most fascinating—and sometimes controversial—figures. From the 
-          lavish banquets of emperors to the simple comfort foods of revolutionaries, every meal tells a story.
-        </p>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute top-0 lg:inset-y-0 left-0 w-full lg:w-[40%] h-[15rem] sm:h-[19rem] lg:h-auto bg-gold" aria-hidden="true"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-[40%_1fr] gap-12 items-center">
+      <div class="flex justify-center lg:justify-end">
+        <div class="w-64 sm:w-80 lg:translate-x-14 rotate-[3deg] rounded-[1.75rem] bg-cream p-2.5 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]">
+          <img src="/images/kaz.jpg" alt="Kaz" class="rounded-[1.25rem] w-full aspect-square object-cover" width="600" height="600" />
+        </div>
       </div>
+      <div class="lg:pl-24">
+        <p class="eyebrow">About the channel</p>
+        <h1 class="mt-4 font-display uppercase text-6xl sm:text-8xl leading-[0.86]">
+          Hey, it's <span class="text-gold">Kaz.</span>
+        </h1>
+        <p class="mt-6 text-xl text-cream/75 leading-relaxed max-w-xl">
+          A curious home cook and hungry history enthusiast, exploring history through the meals of iconic and controversial figures — and, lately, the national dishes of the world.
+        </p>
+        <dl class="mt-10 flex flex-wrap gap-x-10 gap-y-4">
+          <div><dt class="text-[0.68rem] uppercase tracking-label text-cream/50">Episodes</dt><dd class="font-display text-5xl">{episodes.length}</dd></div>
+          <div><dt class="text-[0.68rem] uppercase tracking-label text-cream/50">Recipes</dt><dd class="font-display text-5xl">{recipes.length}</dd></div>
+          <div><dt class="text-[0.68rem] uppercase tracking-label text-cream/50">New video</dt><dd class="font-display text-5xl text-gold">WEEKLY</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
 
-      <h2 class="text-2xl font-bold mb-4">Why Food and History?</h2>
+  <!-- The concept -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-20" data-reveal>
+    <h2 class="font-display uppercase text-5xl sm:text-6xl leading-[0.9]">The<br /><span class="text-gold">concept</span></h2>
+    <div class="km-prose">
       <p>
-        Food is one of the most universal human experiences. It transcends time, connecting us to people 
-        who lived centuries ago through shared tastes, techniques, and traditions. When we cook Napoleon's 
-        favorite honey cakes or prepare a meal that sustained medieval knights, we're not just following 
+        History isn't just about dates, battles, and political movements—it's about the people who lived it.
+        And what better way to understand historical figures than through something as intimate and personal
+        as their favorite meals?
+      </p>
+      <p>
+        Each episode of Kaz Mielony takes you on a culinary journey through time, recreating dishes that
+        were beloved by some of history's most fascinating—and sometimes controversial—figures. From the
+        lavish banquets of emperors to the simple comfort foods of revolutionaries, every meal tells a story.
+      </p>
+    </div>
+  </section>
+
+  <!-- Series -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 grid md:grid-cols-2 gap-5">
+    {SERIES_KEYS.map((k, i) => (
+      <a
+        href={`/episodes?series=${k}`}
+        class:list={[
+          "group rounded-3xl p-8 sm:p-10 transition-transform hover:-translate-y-1",
+          k === 'nations' ? "bg-gold text-charcoal" : "bg-charcoal ring-1 ring-smoke",
+        ]}
+        data-reveal
+        style={`--reveal-delay:${i * 120}ms`}
+      >
+        <p class:list={["text-xs font-semibold uppercase tracking-label", k === 'nations' ? "text-charcoal/60" : "text-gold"]}>
+          {seriesCounts[k]} episodes
+        </p>
+        <h3 class="mt-3 font-display uppercase text-5xl leading-[0.9]">{SERIES[k].name}</h3>
+        <p class:list={["mt-4", k === 'nations' ? "text-charcoal/75" : "text-cream/65"]}>{SERIES[k].tagline}</p>
+        <p class="mt-8 font-semibold">Browse episodes <span class="inline-block transition-transform group-hover:translate-x-1">→</span></p>
+      </a>
+    ))}
+  </section>
+
+  <!-- Why food & history -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-20" data-reveal>
+    <h2 class="font-display uppercase text-5xl sm:text-6xl leading-[0.9]">Why food<br /><span class="text-gold">&amp; history?</span></h2>
+    <div class="km-prose">
+      <p>
+        Food is one of the most universal human experiences. It transcends time, connecting us to people
+        who lived centuries ago through shared tastes, techniques, and traditions. When we cook Napoleon's
+        favorite honey cakes or prepare a meal that sustained medieval knights, we're not just following
         recipes—we're participating in history.
       </p>
-
-      <p>
-        These recipes offer unique insights into:
-      </p>
+      <p>These recipes offer unique insights into:</p>
       <ul>
         <li>The economic conditions of different time periods</li>
         <li>Cultural exchange and trade routes</li>
@@ -44,60 +92,67 @@ import Layout from '../components/Layout.astro';
         <li>Personal preferences that humanize historical figures</li>
         <li>The evolution of cooking techniques and ingredients</li>
       </ul>
+    </div>
+  </section>
 
-      <h2 class="text-2xl font-bold mb-4">The Research Process</h2>
-      <p>
-        Every episode begins with extensive historical research. I dive into:
-      </p>
-      <ul>
-        <li>Period cookbooks and manuscripts</li>
-        <li>Personal letters and diaries</li>
-        <li>Historical accounts from servants and contemporaries</li>
-        <li>Archaeological evidence of dining practices</li>
-        <li>Regional food traditions and availability</li>
-      </ul>
-      
-      <p>
-        Sometimes the recipes need adaptation for modern kitchens and ingredients, but I always strive 
-        to maintain the authentic spirit and flavors of the original dishes.
-      </p>
+  <!-- Research -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24" data-reveal>
+    <div class="rounded-3xl bg-cream text-charcoal p-8 sm:p-12 grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-20">
+      <div>
+        <h2 class="font-display uppercase text-5xl sm:text-6xl leading-[0.9]">The research<br /><span class="text-gold-deep">process</span></h2>
+        <p class="mt-6 text-charcoal/70">
+          Every episode begins with extensive historical research. Sometimes the recipes need adaptation for modern kitchens and ingredients, but I always strive
+          to maintain the authentic spirit and flavors of the original dishes.
+        </p>
+      </div>
+      <ol class="grid sm:grid-cols-2 gap-3">
+        {[
+          'Period cookbooks and manuscripts',
+          'Personal letters and diaries',
+          'Historical accounts from servants and contemporaries',
+          'Archaeological evidence of dining practices',
+          'Regional food traditions and availability',
+        ].map((item, i) => (
+          <li class="rounded-2xl bg-charcoal/[0.05] p-5">
+            <span class="font-display text-3xl text-gold-deep">{String(i + 1).padStart(2, '0')}</span>
+            <p class="mt-2 font-medium leading-snug">{item}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
 
-      <h2 class="text-2xl font-bold mb-4">Controversial Figures</h2>
+  <!-- Controversial figures -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-20" data-reveal>
+    <h2 class="font-display uppercase text-5xl sm:text-6xl leading-[0.9]">Controversial<br /><span class="text-gold">figures</span></h2>
+    <div class="km-prose">
       <p>
-        Not all historical figures featured on this channel were saints—many were complex individuals 
-        who made both positive and negative impacts on history. By exploring their culinary preferences, 
-        I aim to present a more nuanced view of history that acknowledges both the human side of these 
+        Not all historical figures featured on this channel were saints—many were complex individuals
+        who made both positive and negative impacts on history. By exploring their culinary preferences,
+        I aim to present a more nuanced view of history that acknowledges both the human side of these
         figures and the full context of their actions.
       </p>
-      
-      <p>
-        Food is politically neutral, but the people who ate it often weren't. These episodes are an 
-        opportunity to discuss history thoughtfully and completely.
-      </p>
+      <blockquote>
+        Food is politically neutral, but the people who ate it often weren't.
+      </blockquote>
+      <p>These episodes are an opportunity to discuss history thoughtfully and completely.</p>
+    </div>
+  </section>
 
-      <div class="bg-surface border border-border p-8 rounded-lg mt-8">
-        <h2 class="text-2xl font-bold mb-4 text-primary">Join the Journey</h2>
-        <p class="text-text-light/90">
-          Whether you're a history buff, a cooking enthusiast, or just curious about the past, 
-          I invite you to join me on this unique culinary adventure. Subscribe to the channel, 
-          try the recipes, and let's explore history together—one meal at a time.
-        </p>
-        
-        <div class="flex flex-wrap gap-4 mt-6">
-          <a 
-            href="https://www.youtube.com/@KazMielony" 
-            class="bg-primary text-text-dark px-6 py-3 rounded-lg font-semibold hover:bg-accent transition-colors"
-          >
-            Subscribe on YouTube
-          </a>
-          <a 
-            href="/recipes" 
-            class="border border-primary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary/10 transition-colors"
-          >
-            Browse All Recipes
-          </a>
-        </div>
+  <!-- CTA -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24" data-reveal>
+    <div class="relative overflow-hidden rounded-3xl bg-charcoal ring-1 ring-smoke p-8 sm:p-14 text-center">
+      <div class="absolute inset-y-0 left-0 w-2 bg-gold" aria-hidden="true"></div>
+      <h2 class="font-display uppercase text-5xl sm:text-7xl leading-[0.9]">Join the <span class="text-gold">journey</span></h2>
+      <p class="mt-5 text-lg text-cream/70 max-w-2xl mx-auto">
+        Whether you're a history buff, a cooking enthusiast, or just curious about the past,
+        I invite you to join me on this unique culinary adventure. Subscribe to the channel,
+        try the recipes, and let's explore history together—one meal at a time.
+      </p>
+      <div class="mt-9 flex flex-wrap justify-center gap-3">
+        <a href="https://www.youtube.com/@KazMielony?sub_confirmation=1" target="_blank" rel="noopener" class="bg-gold text-charcoal font-semibold px-6 py-3.5 rounded-full hover:bg-gold-light transition-colors">Subscribe on YouTube</a>
+        <a href="/recipes" class="ring-1 ring-cream/30 hover:ring-gold hover:text-gold font-semibold px-6 py-3.5 rounded-full transition-colors">Browse all recipes</a>
       </div>
     </div>
-  </div>
+  </section>
 </Layout>

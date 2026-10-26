@@ -19,6 +19,7 @@ const recipesCollection = defineCollection({
     equipment: z.array(z.string()).optional(),
     image: z.string().optional(),
     episode: z.number().optional(), // Which episode featured this recipe
+    series: z.enum(["history", "nations"]).optional(), // Defaults to the linked episode's series
   }),
 });
 
@@ -33,6 +34,7 @@ const episodesCollection = defineCollection({
     description: z.string(),
     relatedRecipes: z.array(z.string()),
     thumbnail: z.string().optional(),
+    series: z.enum(["history", "nations"]).optional(), // Inferred from the description if omitted
   }),
 });
 
