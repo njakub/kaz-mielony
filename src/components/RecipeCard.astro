@@ -1,5 +1,6 @@
 ---
 import { getCloudinaryUrl } from '../utils/cloudinary';
+import { SERIES, formatMinutes, type SeriesKey } from '../utils/series';
 
 export interface Props {
   recipe: {
@@ -9,44 +10,92 @@ export interface Props {
       historicalFigure: string;
       mealType: string;
       cookTime: number;
+      prepTime?: number;
       difficulty: string;
       description: string;
       image?: string;
+      tags?: string[];
+      publishDate?: Date;
     };
   };
+  series?: SeriesKey;
+  episodeNumber?: number;
 }
 
-const { recipe } = Astro.props;
+const { recipe, series, episodeNumber } = Astro.props;
+const { data } = recipe;
+const totalTime = (data.prepTime ?? 0) + data.cookTime;
+const difficultyLevel = { easy: 1, medium: 2, hard: 3 }[data.difficulty] ?? 2;
+const searchText = [data.title, data.historicalFigure, data.description, ...(data.tags ?? [])].join(' ').toLowerCase();
 ---
 
-<article class="bg-secondary rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-primary/20">
-  {recipe.data.image && (
-    <a href={`/recipes/${recipe.slug}`} class="block relative w-full h-48 bg-surface overflow-hidden">
-      <img 
-        src={getCloudinaryUrl(recipe.data.image, { width: 400, height: 300, crop: 'fill', gravity: 'center' })}
-        alt={recipe.data.title}
-        class="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-300"
+<article
+  class="recipe-card group relative flex flex-col rounded-2xl bg-charcoal ring-1 ring-smoke hover:ring-gold/60 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_-20px_rgba(229,192,116,0.35)]"
+  data-series={series}
+  data-meal={data.mealType}
+  data-difficulty={data.difficulty}
+  data-time={totalTime}
+  data-date={data.publishDate?.getTime()}
+  data-title={data.title.toLowerCase()}
+  data-search={searchText}
+>
+  <div class="relative aspect-[4/3] overflow-hidden bg-charcoal">
+    {data.image ? (
+      <img
+        src={getCloudinaryUrl(data.image, { width: 640, height: 480, crop: 'fill', gravity: 'auto' })}
+        alt=""
+        class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         loading="lazy"
+        decoding="async"
       />
-    </a>
-  )}
-  <div class="p-6">
-    <h3 class="text-xl font-bold mb-2">
-      <a href={`/recipes/${recipe.slug}`} class="text-text-dark hover:text-accent transition-colors">
-        {recipe.data.title}
+    ) : (
+      <div class="w-full h-full grid place-items-center bg-gold text-charcoal font-display uppercase text-3xl px-6 text-center">
+        {data.historicalFigure}
+      </div>
+    )}
+    <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent"></div>
+    <div class="absolute top-3 left-3 flex gap-1.5">
+      {series && (
+        <span class:list={[
+          "text-[0.65rem] font-semibold uppercase tracking-[0.14em] px-2.5 py-1 rounded-full",
+          series === 'nations' ? "bg-cream text-charcoal" : "bg-gold text-charcoal",
+        ]}>
+          {SERIES[series].short}
+        </span>
+      )}
+      {episodeNumber !== undefined && (
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] px-2.5 py-1 rounded-full bg-ink/70 backdrop-blur text-cream">
+          Ep {episodeNumber}
+        </span>
+      )}
+    </div>
+    <p class="absolute bottom-3 left-4 right-4 font-serif italic text-xl text-cream leading-tight">
+      {data.historicalFigure}
+    </p>
+  </div>
+
+  <div class="flex flex-col flex-1 p-5">
+    <h3 class="text-lg font-semibold leading-snug text-cream">
+      <a href={`/recipes/${recipe.slug}`} class="after:absolute after:inset-0 focus:outline-none">
+        {data.title}
       </a>
     </h3>
-    <p class="text-muted mb-3">Inspired by {recipe.data.historicalFigure}</p>
-    <p class="text-text-dark/80 text-sm mb-4 line-clamp-2">{recipe.data.description}</p>
-    <div class="flex justify-between items-center text-sm">
-      <span class="bg-accent text-secondary px-3 py-1 rounded-full capitalize font-medium text-xs">{recipe.data.mealType}</span>
-      <span class="flex items-center text-muted">
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        {recipe.data.cookTime} min
+    <p class="mt-2 text-sm text-cream/60 line-clamp-2">{data.description}</p>
+
+    <div class="mt-auto pt-5 flex items-center gap-4 text-xs text-cream/70">
+      <span class="inline-flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        {formatMinutes(totalTime)}
       </span>
-      <span class="capitalize font-medium text-accent">{recipe.data.difficulty}</span>
+      <span class="inline-flex items-center gap-1.5 capitalize" title={`Difficulty: ${data.difficulty}`}>
+        <span class="flex gap-0.5" aria-hidden="true">
+          {[1, 2, 3].map((n) => (
+            <span class:list={["w-1.5 h-3 rounded-sm", n <= difficultyLevel ? "bg-gold" : "bg-smoke"]}></span>
+          ))}
+        </span>
+        {data.difficulty}
+      </span>
+      <span class="ml-auto capitalize text-cream/50">{data.mealType}</span>
     </div>
   </div>
 </article>

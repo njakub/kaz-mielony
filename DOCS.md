@@ -90,6 +90,7 @@ The website uses Astro's Content Collections for type-safe content management. A
   ingredients: string[]           // List of ingredients
   equipment?: string[]            // Optional equipment list
   image?: string                  // Optional recipe image
+  series?: 'history' | 'nations'  // Optional — defaults to the linked episode's series
 }
 ```
 
@@ -105,6 +106,7 @@ The website uses Astro's Content Collections for type-safe content management. A
   description: string            // Episode description
   relatedRecipes: string[]       // Array of related recipe slugs
   thumbnail?: string             // Optional custom thumbnail
+  series?: 'history' | 'nations' // Optional — inferred: "National Dishes Series" in the description → nations, otherwise history
 }
 ```
 
@@ -313,8 +315,21 @@ npm run preview
 
 If needed, add environment variables in your deployment platform:
 
-- `YOUTUBE_API_KEY`: For enhanced YouTube integration
+- `YOUTUBE_API_KEY`: YouTube Data API v3 key. Pulls total channel views and subscribers at build time for the homepage "By the numbers" panel
+- `INSTAGRAM_VIEWS` / `INSTAGRAM_FOLLOWERS`: Set by hand (Instagram has no simple public API for account totals). Accepts `1234567`, `350K` or `1.2M`
+- `TIKTOK_VIEWS` / `TIKTOK_FOLLOWERS`: Set by hand, same format
+- `YOUTUBE_VIEWS` / `YOUTUBE_SUBSCRIBERS`: Optional manual overrides for the YouTube numbers
 - `SITE_URL`: Your production URL
+
+Numbers are read at build time, so they refresh on every deploy. Platforms with no numbers are left out, and the panel hides entirely if none are set.
+
+### Sound Bites (Shorts)
+
+The Sound Bites rail on the homepage and episodes page is pulled automatically at build time from each series' Shorts playlist (see `shortsPlaylistId` in `src/utils/series.ts`). No API key needed. A Short whose title mentions "National Dish" is shown as Nations even if it was filed in the History Shorts playlist.
+
+### Tier Lists
+
+All tier lists live on `/tier-list` as tabs (`/tier-list?list=people`). Add a new one by adding an entry to the `lists` array in `src/pages/tier-list.astro` with its Cloudinary folder and a unique `storageKey`. `/people-tier-list` redirects to the People tab.
 
 ## Quick Start
 
@@ -390,6 +405,10 @@ const { title } = Astro.props;
   <slot />
 </div>
 ```
+
+### Adding a New Series
+
+Series (Kaz Cooks History, Kaz Cooks Nations) are defined in `src/utils/series.ts`, each with its YouTube playlist link. To add one, add an entry there and add its key to the `series` enum in `src/content/config.ts`, then set `series: "<key>"` in the new episodes' frontmatter. The episode tabs, recipe filters, homepage panels and roulette all pick it up automatically.
 
 ### Adding New Collections
 

@@ -1,0 +1,394 @@
+---
+// A draggable S–D tier list. Several can live on one page: all DOM lookups are
+// scoped to this instance's root element, and each list has its own storage key.
+export interface TierItem {
+  id: string;
+  name: string;
+  image: string;
+  href: string | null;
+}
+
+export interface Props {
+  id: string;
+  storageKey: string;
+  items: TierItem[];
+  footnote?: string;
+  passwordHash: string;
+}
+
+const { id, storageKey, items, footnote, passwordHash } = Astro.props;
+const allRecipeItems = items;
+const initialAssignments: Record<string, string> = {};
+
+const tierConfig = [
+  { letter: "S", label: "Legendary", color: "#e5c074", text: "#282828" },
+  { letter: "A", label: "Excellent", color: "#e9a35f", text: "#282828" },
+  { letter: "B", label: "Good", color: "#d9cfae", text: "#282828" },
+  { letter: "C", label: "Decent", color: "#8f8a7d", text: "#fbf7ef" },
+  { letter: "D", label: "Meh", color: "#55524b", text: "#fbf7ef" },
+];
+---
+
+<div id={id} class="tier-list">
+  <!-- Tier rows -->
+  <div class="space-y-2.5">
+    {
+      tierConfig.map((tier) => (
+        <div class="flex gap-2.5 items-stretch">
+          <div
+            class="w-20 sm:w-28 flex-shrink-0 flex flex-col items-center justify-center rounded-2xl select-none"
+            style={`background-color: ${tier.color}; color: ${tier.text};`}
+          >
+            <span class="font-display text-5xl sm:text-6xl leading-none">{tier.letter}</span>
+            <span class="mt-1 text-[0.6rem] sm:text-[0.65rem] font-semibold uppercase tracking-[0.14em] opacity-75">{tier.label}</span>
+          </div>
+          <div
+            class="tier-zone flex-1 rounded-2xl p-3 min-h-[120px] sm:min-h-[156px] flex items-center content-start gap-2 flex-wrap bg-charcoal ring-1 ring-smoke"
+            data-tier={tier.letter}
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <!-- Unranked pool -->
+  <div class="mt-8">
+    <h2 class="text-xs font-semibold uppercase tracking-label text-cream/50 mb-3">
+      Unranked
+    </h2>
+    <div
+      data-unranked
+      class="tier-zone border-2 border-dashed border-smoke rounded-2xl p-3 min-h-[120px] sm:min-h-[156px] flex items-center content-start gap-2 flex-wrap bg-ink"
+      data-tier="unranked"
+    >
+    </div>
+  </div>
+
+  <div class="mt-5 flex justify-between items-center">
+    <button
+      data-lock-btn
+      class="text-sm text-cream/50 hover:text-gold transition-colors"
+    ></button>
+    <button
+      data-reset-btn
+      class="text-sm text-cream/50 hover:text-tomato transition-colors hidden"
+    >
+      Reset to defaults
+    </button>
+  </div>
+
+  {footnote && (
+    <p class="mt-8 text-center text-sm text-cream/40">
+      {footnote}
+    </p>
+  )}
+</div>
+
+<style>
+  .tier-zone.drag-over {
+    outline: 2px solid #e5c074;
+    outline-offset: 2px;
+    background-color: rgba(229, 192, 116, 0.08);
+  }
+  .tier-list :global(.tier-card) {
+    position: relative;
+    cursor: grab;
+    user-select: none;
+    border-radius: 0.875rem;
+    overflow: hidden;
+    width: 104px;
+    height: 104px;
+    flex-shrink: 0;
+    background: #32312e;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  @media (min-width: 640px) {
+    .tier-list :global(.tier-card) {
+      width: 140px;
+      height: 140px;
+    }
+  }
+  .tier-list :global(.tier-card:hover) {
+    box-shadow: 0 0 0 2px #e5c074;
+  }
+  .tier-list :global(.tier-card:active) {
+    cursor: grabbing;
+  }
+  .tier-list :global(.tier-card[draggable="false"]) {
+    cursor: default;
+  }
+  .tier-list :global(.tier-card[draggable="false"]:active) {
+    cursor: default;
+  }
+  .tier-list :global(.tier-card[draggable="false"]:hover) {
+    box-shadow: none;
+  }
+  .tier-list :global(.tier-card[draggable="false"]:hover img) {
+    transform: none;
+  }
+  .tier-list :global(.tier-card.dragging) {
+    opacity: 0.35;
+  }
+  .tier-list :global(.tier-card img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    transition: transform 0.15s;
+  }
+  .tier-list :global(.tier-card:hover img) {
+    transform: scale(1.07);
+  }
+</style>
+
+<script define:vars={{ id, storageKey, allRecipeItems, initialAssignments, passwordHash }}>
+  const STORAGE_KEY = storageKey;
+
+  /* ── Auth ─────────────────────────────────────────────── */
+  const SESSION_KEY = "kaz-tier-unlocked";
+
+  function isEditing() {
+    return !!passwordHash && sessionStorage.getItem(SESSION_KEY) === "1";
+  }
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function promptUnlock() {
+    const pw = prompt("Enter edit password:");
+    if (!pw) return;
+    const hash = await sha256(pw);
+    if (hash === passwordHash) {
+      sessionStorage.setItem(SESSION_KEY, "1");
+      location.reload();
+    } else {
+      alert("Incorrect password.");
+    }
+  }
+
+  /* ── Persistence ─────────────────────────────────────── */
+  function loadState() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function saveState(root) {
+    const tiers = {};
+    root.querySelectorAll(".tier-zone").forEach((zone) => {
+      tiers[zone.dataset.tier] = [
+        ...zone.querySelectorAll(".tier-card"),
+      ].map((c) => c.dataset.id);
+    });
+
+    const externalItems = {};
+    root.querySelectorAll(".tier-card[data-external]").forEach((c) => {
+      externalItems[c.dataset.id] = {
+        name: c.dataset.name,
+        image: c.dataset.image,
+      };
+    });
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ tiers, externalItems })
+    );
+  }
+
+  /* ── Card factory ────────────────────────────────────── */
+  let draggingId = null;
+
+  function createCard({ id, name, image, href, external }) {
+    const card = document.createElement("div");
+    card.className = "tier-card";
+    card.draggable = isEditing();
+    card.dataset.id = id;
+    card.dataset.name = name;
+    card.dataset.image = image;
+    if (external) card.dataset.external = "1";
+
+    const img = document.createElement("img");
+    img.src = image;
+    img.alt = name;
+    img.draggable = false;
+
+    card.appendChild(img);
+
+    if (href) {
+      card.addEventListener("click", () => {
+        if (!draggingId) window.location.href = href;
+      });
+    }
+
+    if (isEditing()) {
+      card.addEventListener("dragstart", (e) => {
+        draggingId = id;
+        e.dataTransfer.setData("text/plain", id);
+        e.dataTransfer.effectAllowed = "move";
+        requestAnimationFrame(() => card.classList.add("dragging"));
+      });
+
+      card.addEventListener("dragend", () => {
+        draggingId = null;
+        card.classList.remove("dragging");
+      });
+    }
+
+    return card;
+  }
+
+  /* ── Drop zone wiring ────────────────────────────────── */
+  function wireZone(root, zone) {
+    let counter = 0;
+
+    zone.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      counter++;
+      zone.classList.add("drag-over");
+    });
+
+    zone.addEventListener("dragleave", () => {
+      counter = Math.max(0, counter - 1);
+      if (counter === 0) zone.classList.remove("drag-over");
+    });
+
+    zone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    });
+
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      counter = 0;
+      zone.classList.remove("drag-over");
+
+      // Case 1: moving an existing card between tiers
+      if (draggingId) {
+        const card = root.querySelector(
+          `.tier-card[data-id="${CSS.escape(draggingId)}"]`
+        );
+        if (card) {
+          zone.appendChild(card);
+          saveState(root);
+        }
+        return;
+      }
+
+      // Case 2: image file(s) dropped from the OS
+      const files = [...(e.dataTransfer.files || [])].filter((f) =>
+        f.type.startsWith("image/")
+      );
+      if (files.length) {
+        files.forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const id =
+              "ext_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+            const card = createCard({
+              id,
+              name: file.name.replace(/\.[^.]+$/, ""),
+              image: ev.target.result,
+              href: null,
+              external: true,
+            });
+            zone.appendChild(card);
+            saveState(root);
+          };
+          reader.readAsDataURL(file);
+        });
+        return;
+      }
+
+      // Case 3: image URL dragged from another browser tab
+      const rawUri =
+        e.dataTransfer.getData("text/uri-list") ||
+        e.dataTransfer.getData("text/plain");
+      if (rawUri && /^https?:\/\/.+/i.test(rawUri)) {
+        const id = "ext_" + Date.now();
+        const card = createCard({
+          id,
+          name: "Custom image",
+          image: rawUri,
+          href: null,
+          external: true,
+        });
+        zone.appendChild(card);
+        saveState(root);
+      }
+    });
+  }
+
+  /* ── Bootstrap ───────────────────────────────────────── */
+  document.addEventListener("DOMContentLoaded", () => {
+    const root = document.getElementById(id);
+    if (!root) return;
+    const zones = root.querySelectorAll(".tier-zone");
+    const unranked = root.querySelector("[data-unranked]");
+
+    const recipeMap = Object.fromEntries(allRecipeItems.map((r) => [r.id, r]));
+    const savedState = loadState();
+    const assigned = new Set();
+
+    if (savedState?.tiers) {
+      const ext = savedState.externalItems || {};
+      zones.forEach((zone) => {
+        const ids = savedState.tiers[zone.dataset.tier] || [];
+        ids.forEach((id) => {
+          assigned.add(id);
+          let card;
+          if (recipeMap[id]) {
+            card = createCard({ ...recipeMap[id], external: false });
+          } else if (ext[id]) {
+            card = createCard({ id, ...ext[id], href: null, external: true });
+          }
+          if (card) zone.appendChild(card);
+        });
+      });
+    } else {
+      // First visit — apply hard-coded assignments
+      Object.entries(initialAssignments).forEach(([id, tier]) => {
+        if (!recipeMap[id]) return;
+        const zone = root.querySelector(
+          `.tier-zone[data-tier="${tier}"]`
+        );
+        if (zone) {
+          zone.appendChild(createCard({ ...recipeMap[id], external: false }));
+          assigned.add(id);
+        }
+      });
+    }
+
+    // Everything else lands in the unranked pool
+    allRecipeItems.forEach((r) => {
+      if (!assigned.has(r.id)) {
+        unranked.appendChild(createCard({ ...r, external: false }));
+      }
+    });
+
+    const resetBtn = root.querySelector("[data-reset-btn]");
+    const lockBtn = root.querySelector("[data-lock-btn]");
+
+    if (isEditing()) {
+      zones.forEach((zone) => wireZone(root, zone));
+      resetBtn.classList.remove("hidden");
+      resetBtn.addEventListener("click", () => {
+        if (!confirm("Reset tier list to defaults?")) return;
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      });
+      lockBtn.textContent = "🔓 Lock editing";
+      lockBtn.addEventListener("click", () => {
+        sessionStorage.removeItem(SESSION_KEY);
+        location.reload();
+      });
+    } else if (passwordHash) {
+      lockBtn.textContent = "🔒 Edit tier list";
+      lockBtn.addEventListener("click", promptUnlock);
+    }
+  });
+</script>

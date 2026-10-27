@@ -1,12 +1,38 @@
 ---
 import Analytics from '@vercel/analytics/astro';
+import { getCollection } from 'astro:content';
+import { getCloudinaryUrl } from '../utils/cloudinary';
 
 export interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 
-const { title, description = "Cooking meals inspired by iconic historical figures" } = Astro.props;
+const {
+  title,
+  description = "Kaz recreates the go-to meals of famous (and infamous) figures — and the national dishes of the world. Recipes, episodes and history, one plate at a time.",
+  image = "/images/og-banner.jpg",
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+const ogImage = new URL(image, Astro.site ?? Astro.url).toString();
+
+const navLinks = [
+  { href: "/recipes", label: "Recipes" },
+  { href: "/episodes", label: "Episodes" },
+  { href: "/tier-list", label: "Tier Lists" },
+  { href: "/about", label: "About" },
+];
+
+// Powers every [data-surprise] "random recipe" button on the site
+const surpriseRecipes = (await getCollection('recipes')).map((r) => ({
+  href: `/recipes/${r.slug}`,
+  title: r.data.title,
+  figure: r.data.historicalFigure,
+  image: r.data.image ? getCloudinaryUrl(r.data.image, { width: 480, height: 360, gravity: 'auto' }) : null,
+}));
 ---
 
 <!DOCTYPE html>
@@ -15,63 +41,282 @@ const { title, description = "Cooking meals inspired by iconic historical figure
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#161513" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={`${title} | Kaz Mielony`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://res.cloudinary.com" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
     <title>{title} | Kaz Mielony</title>
   </head>
-  <body class="bg-background text-text-light">
-    <header class="bg-dark border-b border-primary/20">
-      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center">
-            <a href="/" class="text-xl sm:text-2xl font-bold text-primary">Kaz Mielony</a>
-          </div>
-          <div class="flex items-center space-x-3 sm:space-x-6 lg:space-x-8">
-            <a href="/" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors whitespace-nowrap">Home</a>
-            <a href="/recipes" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors whitespace-nowrap">Recipes</a>
-            <a href="/episodes" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors whitespace-nowrap">Episodes</a>
-            <a href="/tier-list" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors whitespace-nowrap">Country Tier</a>
-            <a href="/people-tier-list" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors whitespace-nowrap">People Tier</a>
-            <a href="/about" class="text-sm sm:text-base text-text-light hover:text-primary transition-colors whitespace-nowrap">About</a>
-          </div>
+  <body class="bg-ink text-cream font-sans antialiased selection:bg-gold selection:text-charcoal">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-gold focus:text-charcoal focus:px-4 focus:py-2 focus:rounded-full">Skip to content</a>
+
+    <header id="site-header" class="sticky top-0 z-50 border-b border-transparent transition-colors duration-300">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4" aria-label="Main">
+        <a href="/" class="group flex items-center gap-2.5 shrink-0" aria-label="Kaz Mielony home">
+          <span class="relative grid place-items-center w-9 h-9 rounded-md overflow-hidden bg-charcoal ring-1 ring-smoke">
+            <span class="absolute inset-y-0 left-0 w-[38%] bg-gold"></span>
+            <span class="relative font-display text-xl text-cream leading-none">K</span>
+          </span>
+          <span class="font-display text-xl tracking-wide uppercase leading-none">
+            Kaz <span class="text-gold group-hover:text-cream transition-colors">Mielony</span>
+          </span>
+        </a>
+
+        <ul class="hidden lg:flex items-center gap-1">
+          {navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class:list={[
+                  "relative px-3 py-2 text-sm font-medium rounded-full transition-colors",
+                  isActive(link.href) ? "text-gold" : "text-cream/75 hover:text-cream hover:bg-white/5",
+                ]}
+                aria-current={isActive(link.href) ? "page" : undefined}
+              >
+                {link.label}
+                {isActive(link.href) && <span class="absolute left-3 right-3 -bottom-0.5 h-0.5 bg-gold rounded-full"></span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            data-surprise
+            class="hidden sm:inline-flex items-center gap-2 text-sm font-medium text-cream/80 hover:text-gold px-3 py-2 rounded-full hover:bg-white/5 transition-colors"
+            title="Take me to a random recipe"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+            Surprise me
+          </button>
+          <a
+            href="https://www.youtube.com/@KazMielony?sub_confirmation=1"
+            target="_blank"
+            rel="noopener"
+            class="hidden sm:inline-flex items-center gap-2 bg-gold text-charcoal text-sm font-semibold pl-3 pr-4 py-2 rounded-full hover:bg-gold-light transition-colors"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+            Subscribe
+          </a>
+          <button
+            type="button"
+            id="menu-toggle"
+            class="lg:hidden grid place-items-center w-10 h-10 rounded-full hover:bg-white/5"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            aria-label="Open menu"
+          >
+            <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+          </button>
         </div>
       </nav>
+
+      <div id="mobile-menu" class="lg:hidden hidden border-t border-smoke bg-ink/95 backdrop-blur-xl">
+        <ul class="max-w-7xl mx-auto px-4 py-4 grid gap-1">
+          {navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class:list={[
+                  "block font-display uppercase text-3xl tracking-wide py-2",
+                  isActive(link.href) ? "text-gold" : "text-cream",
+                ]}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+          <li class="flex gap-2 pt-3">
+            <button type="button" data-surprise class="flex-1 border border-smoke rounded-full py-3 text-sm font-semibold">Surprise me</button>
+            <a href="https://www.youtube.com/@KazMielony?sub_confirmation=1" target="_blank" rel="noopener" class="flex-1 text-center bg-gold text-charcoal rounded-full py-3 text-sm font-semibold">Subscribe</a>
+          </li>
+        </ul>
+      </div>
     </header>
 
-    <main>
+    <main id="main">
       <slot />
     </main>
 
-    <footer class="bg-dark border-t border-primary/20 text-text-light mt-16">
-      <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer class="relative mt-24 bg-charcoal border-t border-smoke overflow-hidden">
+      <div class="absolute inset-y-0 left-0 w-2 bg-gold" aria-hidden="true"></div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10">
+        <div class="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <h3 class="text-lg font-bold mb-4 text-primary">Kaz Mielony</h3>
-            <p class="text-text-light/70">Exploring history through the meals of iconic figures.</p>
+            <p class="font-display uppercase text-5xl sm:text-6xl leading-[0.9]">
+              Kaz cooks<br /><span class="text-gold">history.</span>
+            </p>
+            <p class="mt-5 text-cream/60 max-w-sm">
+              A curious home cook and hungry history enthusiast, diving fork-first into the world. New video every week.
+            </p>
           </div>
           <div>
-            <h3 class="text-lg font-bold mb-4 text-primary">Quick Links</h3>
-            <ul class="space-y-2 text-text-light/70">
-              <li><a href="/recipes" class="hover:text-primary transition-colors">All Recipes</a></li>
-              <li><a href="/episodes" class="hover:text-primary transition-colors">Episodes</a></li>
-              <li><a href="/tier-list" class="hover:text-primary transition-colors">Country Tier List</a></li>
-              <li><a href="/people-tier-list" class="hover:text-primary transition-colors">People Tier List</a></li>
-              <li><a href="/about" class="hover:text-primary transition-colors">About</a></li>
+            <h3 class="text-xs font-semibold uppercase tracking-label text-gold mb-4">Cook</h3>
+            <ul class="space-y-2.5 text-cream/70">
+              <li><a href="/recipes" class="hover:text-cream transition-colors">All recipes</a></li>
+              <li><a href="/recipes?series=history" class="hover:text-cream transition-colors">History recipes</a></li>
+              <li><a href="/recipes?series=nations" class="hover:text-cream transition-colors">National dishes</a></li>
+              <li><button type="button" data-surprise class="hover:text-cream transition-colors">Random recipe</button></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-bold mb-4 text-primary">Follow</h3>
-            <ul class="space-y-2 text-text-light/70">
-              <li><a href="https://www.youtube.com/@KazMielony" class="hover:text-primary transition-colors">YouTube</a></li>
-              <li><a href="https://instagram.com/kazmielony" class="hover:text-primary transition-colors">Instagram</a></li>
-              <li><a href="https://twitter.com/kazmielony" class="hover:text-primary transition-colors">Twitter</a></li>
+            <h3 class="text-xs font-semibold uppercase tracking-label text-gold mb-4">Watch</h3>
+            <ul class="space-y-2.5 text-cream/70">
+              <li><a href="/episodes" class="hover:text-cream transition-colors">All episodes</a></li>
+              <li><a href="/tier-list" class="hover:text-cream transition-colors">Tier lists</a></li>
+              <li><a href="https://www.youtube.com/@KazMielony/shorts" target="_blank" rel="noopener" class="hover:text-cream transition-colors">Sound bites</a></li>
+              <li><a href="/about" class="hover:text-cream transition-colors">About Kaz</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-xs font-semibold uppercase tracking-label text-gold mb-4">Follow</h3>
+            <ul class="space-y-2.5 text-cream/70">
+              <li><a href="https://www.youtube.com/@KazMielony" target="_blank" rel="noopener" class="hover:text-cream transition-colors">YouTube</a></li>
+              <li><a href="https://instagram.com/kazmielony" target="_blank" rel="noopener" class="hover:text-cream transition-colors">Instagram</a></li>
+              <li><a href="https://twitter.com/kazmielony" target="_blank" rel="noopener" class="hover:text-cream transition-colors">Twitter</a></li>
+              <li><a href="https://www.tiktok.com/@kazmielony" target="_blank" rel="noopener" class="hover:text-cream transition-colors">TikTok</a></li>
             </ul>
           </div>
         </div>
-        <div class="border-t border-primary/20 mt-8 pt-8 text-center text-muted">
-          <p>&copy; 2024 Kaz Mielony. All rights reserved.</p>
+        <div class="mt-16 pt-6 border-t border-smoke flex flex-col sm:flex-row gap-3 justify-between text-sm text-cream/40">
+          <p>&copy; {new Date().getFullYear()} Kaz Mielony. All rights reserved.</p>
+          <p>Made with butter, research &amp; questionable historical accuracy.</p>
         </div>
       </div>
     </footer>
+
     <Analytics />
+
+    <script is:inline define:vars={{ surpriseRecipes }}>
+      window.__kazRecipes = surpriseRecipes;
+    </script>
+
+    <script>
+      // Header: solid background once the page scrolls
+      const header = document.getElementById('site-header');
+      const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // Mobile menu
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('mobile-menu');
+      toggle?.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        toggle.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
+        menu?.classList.toggle('hidden', open);
+        header?.classList.toggle('menu-open', !open);
+      });
+
+      // Random recipe buttons
+      document.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('[data-surprise]');
+        if (!btn) return;
+        const list = (window as any).__kazRecipes as { href: string }[];
+        const others = list.filter((r) => r.href !== location.pathname);
+        const pick = others[Math.floor(Math.random() * others.length)];
+        if (pick) location.href = pick.href;
+      });
+
+      // Scroll reveal
+      const reveals = document.querySelectorAll('[data-reveal]');
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-in');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: '0px 0px -8% 0px' });
+        reveals.forEach((el) => io.observe(el));
+      } else {
+        reveals.forEach((el) => el.classList.add('is-in'));
+      }
+    </script>
   </body>
 </html>
+
+<style is:global>
+  @view-transition { navigation: auto; }
+
+  html { scroll-behavior: smooth; }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  :focus-visible { outline: 2px solid #e5c074; outline-offset: 3px; border-radius: 4px; }
+
+  #site-header.is-scrolled,
+  #site-header.menu-open {
+    background: rgba(22, 21, 19, 0.82);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border-color: #45433f;
+  }
+
+  .menu-icon { position: relative; display: block; width: 20px; height: 12px; }
+  .menu-icon span { position: absolute; left: 0; right: 0; height: 2px; background: currentColor; border-radius: 2px; transition: transform 0.25s, top 0.25s; }
+  .menu-icon span:first-child { top: 0; }
+  .menu-icon span:last-child { top: 10px; }
+  [aria-expanded="true"] .menu-icon span:first-child { top: 5px; transform: rotate(45deg); }
+  [aria-expanded="true"] .menu-icon span:last-child { top: 5px; transform: rotate(-45deg); }
+
+  /* Scroll reveal — only hides content when JS is running */
+  .js [data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); transition-delay: var(--reveal-delay, 0ms); }
+  .js [data-reveal].is-in { opacity: 1; transform: none; }
+
+  /* Eyebrow labels */
+  .eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #e5c074; }
+  .eyebrow::before { content: ""; width: 1.5rem; height: 2px; background: currentColor; }
+
+  /* Long-form recipe/episode copy */
+  .km-prose { color: rgba(251, 247, 239, 0.82); font-size: 1.0625rem; line-height: 1.75; }
+  .km-prose > * + * { margin-top: 1.1em; }
+  .km-prose h2 { font-family: "Anton", Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.01em; font-size: clamp(1.9rem, 3vw, 2.5rem); line-height: 1; color: #fbf7ef; margin-top: 2.2em; }
+  .km-prose h2:first-child { margin-top: 0; }
+  .km-prose h3 { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #e5c074; margin-top: 2em; }
+  .km-prose h4 { font-weight: 600; color: #fbf7ef; margin-top: 1.6em; }
+  .km-prose strong { color: #fbf7ef; font-weight: 600; }
+  .km-prose em { font-family: "Instrument Serif", Georgia, serif; font-size: 1.15em; color: #f2d9a4; }
+  .km-prose a { color: #e5c074; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .km-prose a:hover { color: #f2d9a4; }
+  .km-prose hr { border: 0; height: 1px; background: #45433f; margin: 3em 0; }
+  .km-prose ul { padding-left: 0; list-style: none; }
+  .km-prose ul > li { position: relative; padding-left: 1.4rem; margin-top: 0.5em; }
+  .km-prose ul > li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 0.5rem; height: 2px; background: #e5c074; }
+  .km-prose ol { list-style: none; padding-left: 0; counter-reset: step; }
+  .km-prose ol > li { counter-increment: step; position: relative; padding-left: 3.5rem; margin-top: 1.4em; }
+  .km-prose ol > li::before { content: counter(step, decimal-leading-zero); position: absolute; left: 0; top: -0.1em; font-family: "Anton", Impact, sans-serif; font-size: 1.6rem; line-height: 1.2; color: #e5c074; }
+  .km-prose blockquote { border-left: 3px solid #e5c074; padding-left: 1.2rem; font-family: "Instrument Serif", Georgia, serif; font-size: 1.4em; line-height: 1.4; color: #fbf7ef; }
+  .km-prose img { border-radius: 0.75rem; }
+  .km-prose table { width: 100%; border-collapse: collapse; font-size: 0.95em; }
+  .km-prose th, .km-prose td { border-bottom: 1px solid #45433f; padding: 0.6em 0.5em; text-align: left; }
+  .km-prose th { color: #e5c074; font-weight: 600; }
+  .km-prose code { background: #32312e; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
+
+  /* Hide scrollbars on horizontal chip rows */
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  @media print {
+    #site-header, footer, .no-print { display: none !important; }
+    body { background: #fff !important; color: #111 !important; }
+    .km-prose, .km-prose h2, .km-prose strong, .km-prose em { color: #111 !important; }
+  }
+</style>

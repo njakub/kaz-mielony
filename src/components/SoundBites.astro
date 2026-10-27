@@ -1,0 +1,136 @@
+---
+import { SERIES } from '../utils/series';
+import { formatCompact, type Short } from '../utils/youtube';
+
+export interface Props {
+  shorts: Short[];
+  heading?: string;
+}
+
+const { shorts, heading = 'Sound bites' } = Astro.props;
+const items = shorts.map((s) => ({ id: s.id, title: s.title }));
+---
+
+{shorts.length > 0 && (
+  <section class="sound-bites" data-bites={JSON.stringify(items)}>
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+      <div>
+        <p class="eyebrow">Shorts · under a minute</p>
+        <h2 class="mt-3 font-display uppercase text-5xl sm:text-6xl leading-[0.92]">
+          {heading}<span class="text-gold">.</span>
+        </h2>
+        <p class="mt-3 text-cream/60 max-w-md">History and national dishes, served in bite-size pieces.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="https://www.youtube.com/@KazMielony/shorts" target="_blank" rel="noopener" class="mr-2 font-semibold text-gold hover:text-gold-light text-sm">All Shorts ↗</a>
+        <button type="button" data-rail-prev class="hidden sm:grid place-items-center w-11 h-11 rounded-full ring-1 ring-smoke hover:ring-gold hover:text-gold transition-colors" aria-label="Scroll back">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button type="button" data-rail-next class="hidden sm:grid place-items-center w-11 h-11 rounded-full ring-1 ring-smoke hover:ring-gold hover:text-gold transition-colors" aria-label="Scroll forward">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <ul data-rail class="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 pb-2 scroll-px-4 sm:scroll-px-6 lg:scroll-px-8">
+      {shorts.map((s, i) => (
+        <li class="snap-start shrink-0 w-[11.5rem] sm:w-[13.5rem]">
+          <button
+            type="button"
+            data-bite-index={i}
+            class="group relative block w-full aspect-[9/16] rounded-2xl overflow-hidden bg-charcoal ring-1 ring-smoke hover:ring-gold text-left transition-all duration-300 hover:-translate-y-1"
+            aria-label={`Play short: ${s.title}`}
+          >
+            <img src={s.thumbnail} alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]" loading="lazy" decoding="async" />
+            <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-ink/30"></div>
+            <span class:list={[
+              "absolute top-2.5 left-2.5 text-[0.6rem] font-semibold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full",
+              s.series === 'nations' ? "bg-cream text-charcoal" : "bg-gold text-charcoal",
+            ]}>{SERIES[s.series].short}</span>
+            {s.views > 0 && (
+              <span class="absolute top-2.5 right-2.5 inline-flex items-center gap-1 text-[0.68rem] font-semibold bg-ink/70 backdrop-blur px-2 py-0.5 rounded-full">
+                <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+                {formatCompact(s.views)}
+              </span>
+            )}
+            <span class="absolute inset-0 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
+              <span class="grid place-items-center w-14 h-14 rounded-full bg-gold text-charcoal shadow-xl">
+                <svg class="w-5 h-5 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+              </span>
+            </span>
+            <p class="absolute bottom-0 inset-x-0 p-3.5 font-semibold text-sm leading-snug line-clamp-3">{s.title}</p>
+          </button>
+        </li>
+      ))}
+    </ul>
+
+    <dialog data-bite-dialog class="bite-dialog bg-transparent p-0 m-auto max-w-none max-h-none overflow-visible backdrop:bg-ink/90 backdrop:backdrop-blur-sm">
+      <div class="relative flex items-center gap-3 sm:gap-6">
+        <button type="button" data-bite-step="-1" class="grid place-items-center w-11 h-11 shrink-0 rounded-full bg-graphite text-cream ring-1 ring-smoke hover:ring-gold hover:text-gold" aria-label="Previous short">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <div data-bite-frame class="relative h-[min(82vh,46rem)] aspect-[9/16] max-w-[calc(100vw-8rem)] rounded-2xl overflow-hidden bg-ink ring-1 ring-smoke shadow-2xl"></div>
+        <button type="button" data-bite-step="1" class="grid place-items-center w-11 h-11 shrink-0 rounded-full bg-graphite text-cream ring-1 ring-smoke hover:ring-gold hover:text-gold" aria-label="Next short">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button type="button" data-bite-close class="absolute -top-12 right-0 sm:right-14 grid place-items-center w-10 h-10 rounded-full bg-graphite text-cream ring-1 ring-smoke hover:ring-gold" aria-label="Close">✕</button>
+      </div>
+      <p data-bite-title class="mt-4 text-center text-cream font-semibold max-w-md mx-auto px-4"></p>
+    </dialog>
+  </section>
+)}
+
+<style>
+  .bite-dialog[open] { animation: bite-in 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  @keyframes bite-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-bites]').forEach((root) => {
+    const items: { id: string; title: string }[] = JSON.parse(root.dataset.bites!);
+    const rail = root.querySelector<HTMLElement>('[data-rail]')!;
+    const dialog = root.querySelector<HTMLDialogElement>('[data-bite-dialog]')!;
+    const frame = root.querySelector<HTMLElement>('[data-bite-frame]')!;
+    const titleEl = root.querySelector<HTMLElement>('[data-bite-title]')!;
+    let current = 0;
+
+    const scrollBy = (dir: number) => rail.scrollBy({ left: dir * rail.clientWidth * 0.8, behavior: 'smooth' });
+    root.querySelector('[data-rail-prev]')?.addEventListener('click', () => scrollBy(-1));
+    root.querySelector('[data-rail-next]')?.addEventListener('click', () => scrollBy(1));
+
+    function play(i: number) {
+      current = (i + items.length) % items.length;
+      const item = items[current];
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${item.id}?autoplay=1&rel=0&playsinline=1`;
+      iframe.title = item.title;
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; clipboard-write';
+      iframe.allowFullscreen = true;
+      iframe.className = 'absolute inset-0 w-full h-full';
+      frame.replaceChildren(iframe);
+      titleEl.textContent = item.title;
+    }
+
+    root.querySelectorAll<HTMLElement>('[data-bite-index]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        play(Number(btn.dataset.biteIndex));
+        dialog.showModal();
+      })
+    );
+    root.querySelectorAll<HTMLElement>('[data-bite-step]').forEach((btn) =>
+      btn.addEventListener('click', () => play(current + Number(btn.dataset.biteStep)))
+    );
+    const close = () => {
+      dialog.close();
+      frame.replaceChildren();
+    };
+    root.querySelector('[data-bite-close]')?.addEventListener('click', close);
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) close(); });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') play(current + 1);
+      if (e.key === 'ArrowLeft') play(current - 1);
+    });
+    // Esc closes the dialog natively — stop playback then too
+    dialog.addEventListener('close', () => frame.replaceChildren());
+  });
+</script>

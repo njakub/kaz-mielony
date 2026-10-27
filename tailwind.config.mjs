@@ -4,86 +4,55 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Brand palette — pulled from the "Kaz Cooks History" channel banner
+        ink: "#161513", // Deepest background
+        charcoal: "#282828", // Banner charcoal
+        graphite: "#32312e", // Raised surfaces
+        smoke: "#45433f", // Borders on dark
+        gold: {
+          DEFAULT: "#e5c074", // Banner mustard
+          light: "#f2d9a4",
+          deep: "#c99a3e",
+        },
+        cream: "#fbf7ef", // Banner off-white
+        paper: "#f3ecdf", // Light surfaces
+        tomato: "#e0644a", // Sparing accent for alerts/timers
+
+        // Legacy tokens kept so older markup keeps working
         background: "#282828",
-        primary: "#e8c074",
-        secondary: "#fdf8f0",
-        // Extended palette for better contrast
-        dark: "#1a1a1a", // Darker background for depth
-        "dark-alt": "#3a3a3a", // Lighter dark for cards/surfaces
-        "text-dark": "#2d2d2d", // Dark text for light backgrounds
-        "text-light": "#f5f5f5", // Light text for dark backgrounds
-        accent: "#d4a853", // Darker golden accent
-        "accent-light": "#f2d18a", // Lighter golden accent
-        muted: "#8a8a8a", // Muted text
-        surface: "#333333", // Card/surface background
-        border: "#4a4a4a", // Border color
-        // Keep some amber variants for compatibility
-        amber: {
-          50: "#fdf8f0",
-          100: "#fdf8f0",
-          600: "#e8c074",
-          700: "#d4a853",
-          800: "#c19639",
+        primary: "#e5c074",
+        secondary: "#fbf7ef",
+        dark: "#161513",
+        "dark-alt": "#32312e",
+        "text-dark": "#282828",
+        "text-light": "#fbf7ef",
+        accent: "#c99a3e",
+        "accent-light": "#f2d9a4",
+        muted: "#9a958c",
+        surface: "#32312e",
+        border: "#45433f",
+      },
+      fontFamily: {
+        display: ['"Anton"', "Impact", '"Arial Narrow"', "sans-serif"],
+        sans: ['"Inter"', "system-ui", "-apple-system", "sans-serif"],
+        serif: ['"Instrument Serif"', "Georgia", "serif"],
+      },
+      letterSpacing: {
+        label: "0.18em",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "word-in": {
+          "0%": { transform: "translateY(60%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
         },
       },
-      typography: {
-        DEFAULT: {
-          css: {
-            color: "#f5f5f5",
-            h1: {
-              color: "#f5f5f5",
-            },
-            h2: {
-              color: "#e8c074",
-            },
-            h3: {
-              color: "#d4a853",
-            },
-            h4: {
-              color: "#f5f5f5",
-            },
-            p: {
-              color: "#f5f5f5",
-            },
-            strong: {
-              color: "#f5f5f5",
-            },
-            ol: {
-              color: "#f5f5f5",
-              listStyleType: "decimal",
-              paddingLeft: "2rem",
-              marginLeft: "1rem",
-            },
-            "ol > li": {
-              color: "#f5f5f5",
-              marginBottom: "1rem",
-              paddingLeft: "0.5rem",
-            },
-            "ol > li::marker": {
-              color: "#e8c074",
-              fontWeight: "bold",
-            },
-            ul: {
-              color: "#f5f5f5",
-              listStyle: "none",
-              paddingLeft: "0",
-            },
-            "ul > li": {
-              position: "relative",
-              paddingLeft: "1.5rem",
-              marginBottom: "0.5rem",
-              color: "#f5f5f5",
-            },
-            "ul > li::before": {
-              content: "'•'",
-              position: "absolute",
-              left: "0",
-              top: "0",
-              color: "#e8c074",
-              fontWeight: "bold",
-            },
-          },
-        },
+      animation: {
+        marquee: "marquee 40s linear infinite",
+        "word-in": "word-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both",
       },
     },
   },
